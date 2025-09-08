@@ -183,6 +183,10 @@ robot_name = "TonyPi"
 ```python
 # 列表 (list)：机器人常用动作
 robot_actions = ["前进", "后退", "挥手", "点头"]
+# 遍历列表
+print("🤖 机器人常用动作：")
+for action in robot_actions:
+    print("-", action)
 
 # 字典 (dict)：机器人传感器数据
 robot_sensors = {
@@ -190,9 +194,17 @@ robot_sensors = {
     "舵机": "LX-824HV高压总线舵机和LFD-O1M防堵转舵机",
     "控制板": "树莓派主板和树莓派扩展板"
 }
+# 遍历字典
+print("\n🔧 机器人传感器数据：")
+for key, value in robot_sensors.items():
+    print(f"{key} : {value}")
 
 # 元组 (tuple)：机器人电池信息（电压 V,容量 mAh，电池类型）
 robot_battery = ('11.1V', '2000mAh','10C锂电池')
+# 遍历元组
+print("\n🔋 机器人电池信息：")
+for info in robot_battery:
+    print("-", info)
 
 ```
 
@@ -364,6 +376,12 @@ robot.charge(30)
 
 ## 练习
 
++ 利用AI，自行了解容器：
+  + 增删改查
+  + 列表：切片、列表推导式、解包等
+  + 字典：字典推导式、合并字典、解包等
+  + 元组：切片、解包、嵌套元组等
+
 + 以面向对象的思想，加上机器人的基本控制，设计一个机器人的功能模块
 + 提出三个任何与本节内容相关的问题，并自行回答
 
@@ -384,6 +402,10 @@ robot.charge(30)
 模糊：去除噪声
 
 边缘检测：用于检测地面边界、障碍物
+
+## 绘制图形
+
+绘制检测框
 
 ## 形状与轮廓检测
 
