@@ -935,7 +935,19 @@ print("Conv2D output shape:", y.shape)
 
 
 
-## 远程连接工具（任选）
+## 远程连接工具
+
+### VNC-Viewer
+
+选择合适版本VNC-Viewer安装
+
+![image-20250916114105939](01_dev_env_assets/image-20250916114105939.png)
+
+安装后打开，如下图，连接过桌面会保存连接记录：
+
+![image-20250916114303790](01_dev_env_assets/image-20250916114303790.png)
+
+
 
 ### windows自带ssh工具
 
