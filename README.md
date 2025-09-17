@@ -162,7 +162,7 @@ TonyPi Pro基于树莓派5B开发，它在TonyPi机器人的基础上做了很�
 
 | 硬件/系统          | 参数/版本                                                    |
 | :----------------- | :----------------------------------------------------------- |
-| 机体尺寸           | 高度*肩宽*厚度 373*187*106mm                                 |
+| 机体尺寸           | 高度*肩宽*厚度 373x187x106mm                                 |
 | 机体重量           | 约1.8kg(不含开合手掌)                                        |
 | 机体材料           | 硬铝合金                                                     |
 | 摄像头分辨率       | 480P                                                         |
@@ -203,7 +203,13 @@ TonyPi背部搭载了一个电压显示模块，可实时观察机器人当前�
 
 ![image-20250916111104462](README_assets/image-20250916111104462.png)
 
-TonyPi的工作电压范围大小为9V-12.6V，当电量充满时，电压显示模块会显示“**12.6**”，当前电压小于10V时，请及时给机器人充电。
+
+
+#### 充电
+
+将充电器插入充电口。TonyPi的工作电压范围大小为9V-12.6V，当电量充满时，电压显示模块会显示“**12.6**”，当前电压小于10V时，请及时给机器人充电。
+
+![image-20250916121513660](README_assets/image-20250916121513660.png)
 
 
 
@@ -236,6 +242,96 @@ TonyPi的工作电压范围大小为9V-12.6V，当电量充满时，电压显示
 
 
 
+#### 手机app连接
+
+[官网](https://www.hiwonder.com.cn/downloads.html)下载安装手机APP。
+
+![image-20250916135443389](README_assets/image-20250916135443389.png)
+
+打开软件，点击“进阶套件”-“TonyPi”-“Tony Pi Pro”
+
+![image-20250916142806700](README_assets/image-20250916142806700.png)
+
+点击右下角加号，选择直连模式，连接HW开头的热点，密码为hiwonder。
+
+![image-20250916142937592](README_assets/image-20250916142937592.png)
+
+![image-20250916143024979](README_assets/image-20250916143024979.png)
+
+![image-20250916143216510](README_assets/image-20250916143216510.png)
+
+连接完成后返回APP，再次搜索设备可看见可用设备：
+
+![image-20250916143326463](README_assets/image-20250916143326463.png)
+
+长按设备可查看ip和id：
+
+![image-20250916143421266](README_assets/image-20250916143421266.png)
+
+点击设备，进行操作。
+
+![image-20250916143445118](README_assets/image-20250916143445118.png)
+
+
+
+
+
+#### 连接到局域网
+
+> 机器人成功连接到局域网之后就不会再开启HW开头的热点，要再次开启热点，根据[重启热点](#重启热点)进行操作。
+
+手机先连接到HW开头的热点，打开app，选择局域网模式。
+
+![image-20250916151723106](README_assets/image-20250916151723106.png)
+
+选择wifi（wifi名称为英文）进行连接
+
+![image-20250916152637567](README_assets/image-20250916152637567.png)
+
+输入wifi密码，等待连接完成。
+
+![image-20250916152713830](README_assets/image-20250916152713830.png)
+
+![image-20250916152729409](README_assets/image-20250916152729409.png)
+
+连接完成后，手机连接到wifi，选择局域网模式
+
+![image-20250916152942481](README_assets/image-20250916152942481.png)
+
+![image-20250916152954183](README_assets/image-20250916152954183.png)
+
+从该页面返回
+
+![image-20250916151847673](README_assets/image-20250916151847673.png)
+
+刷新，出现设备，即进入到局域网模式，长按可查看ip和id。
+
+ ![image-20250916153135373](README_assets/image-20250916153135373.png)
+
+![image-20250916153232124](README_assets/image-20250916153232124.png)
+
+
+
+### 重启热点
+
+#### 拆下机器人后盖
+
+> 仅需要重启热点，也可以不拆下机器人后盖，可以直接按到K1。
+
+在关机状态下，分别拧下机器人后盖左右两侧共4颗螺丝。
+
+![image-20250916154144411](README_assets/image-20250916154144411.png)
+
+![image-20250916154211048](README_assets/image-20250916154211048.png)
+
+拆下后盖之后，开机，等待机器人完成启动。可看见主板上的K1按钮、LED灯：
+
+![image-20250916154448672](README_assets/image-20250916154448672.png)
+
+![image-20250916155235378](README_assets/image-20250916155235378.png)
+
+长按K1，直到LED2由常亮变成闪烁，机器人切换为直连模式，重新开启HW开头的热点。
+
 
 
 
@@ -244,13 +340,48 @@ TonyPi的工作电压范围大小为9V-12.6V，当电量充满时，电压显示
 
 参考[软件环境安装文档](./docs/01_dev_env.md)中[python安装](./docs/01_dev_env.md/#python安装)与[VSCode安装](./docs/01_dev_env.md/#VSCode安装)。
 
+打开vscode，在插件中搜索remote，下载Remote-SSH。
+
+![image-20250917111007435](README_assets/image-20250917111007435.png)
+
+下载完成，左侧工具栏会有远程连接图标，点击打开，点击加号，新建远程。
+
+![image-20250917111230221](README_assets/image-20250917111230221.png)
+
+在输入框中输入ssh连接命令，选择一个配置，SSH中会显示新的连接。
+
+```shell
+ssh 用户名@ip
+```
+
+![image-20250917111344412](README_assets/image-20250917111344412.png)
+
+![image-20250917111630395](README_assets/image-20250917111630395.png)
+
+![image-20250917111720167](README_assets/image-20250917111720167.png)
+
+点击设置，打开ssh配置文件，可以看见所有的ssh连接配置。
+
+![image-20250917111902040](README_assets/image-20250917111902040.png)
+
+点击ip右侧的按钮，开启远程连接。
+
+![image-20250917112016444](README_assets/image-20250917112016444.png)
+
+初次连接，远程主机会下载vscode服务器，连接完成后如下图：
+
+![image-20250917112110744](README_assets/image-20250917112110744.png)
+
 
 
 ## 练习
 
++ 完成机器人远程桌面连接、手机app连接以及直连模式与局域网模式的切换
+
 + 完成[软件环境安装文档](./docs/01_dev_env.md)中其它软件的安装
-+ 使用手柄控制机器人
 + 提出三个任何与本节内容相关的问题，并自行回答
+
+
 
 # Python与机器人基本控制（第2周）
 
@@ -265,9 +396,9 @@ Pro不仅保留了之前所有的功能，还拓展出了更多有趣的AI创意
 满足用户对机器视觉、机器人运动学等算法的学习和验证，还为传感器应用、
 视觉抓取等二次开发提供快速、便捷的集成方案。
 """
-# 输出机器人相关信息
+
 print("欢迎来到人形机器人实验室！")
-print("今天的主角是 TonyPi 机器人")
+print("今天的主角是"+" TonyPi"+" 机器人")
 
 ```
 
@@ -281,16 +412,20 @@ print("今天的主角是 TonyPi 机器人")
 
 ```python
 # 整型 (int)：机器人自由度数量
-degree_of_freedom = 20   # 机器人有 20 个自由度
+degree_of_freedom = 20
+print(f"机器人有{degree_of_freedom}个自由度")
 
 # 浮点型 (float)：机器人身高（单位：米）
-robot_height = 0.373   # 机器人身高 0.65 米
+robot_height = 0.373
+print(f"机器人身高 {robot_height} 米")
 
 # 布尔值 (bool)：机器人是否已开机
 robot_power_on = True   # True 表示已开机，False 表示关机
+print(f"机器人现在是{'开机' if robot_power_on else '关机'}状态")
 
 # 字符串 (str)：机器人名称
 robot_name = "TonyPi"
+print(f'机器人名称{">"*20}{robot_name+"<"*20}')
 
 ```
 
@@ -304,7 +439,7 @@ robot_actions = ["前进", "后退", "挥手", "点头"]
 # 遍历列表
 print("🤖 机器人常用动作：")
 for action in robot_actions:
-    print("-", action)
+    print("->", action)
 
 # 字典 (dict)：机器人传感器数据
 robot_sensors = {
@@ -332,14 +467,18 @@ for info in robot_battery:
 
 ```python
 # 类型转换：把整型转成字符串
-servo_str = str(robot_servo)
-print("机器人有 " + servo_str + " 个舵机")
+degree_of_freedom = 8
+degree_of_freedom_str = str(degree_of_freedom)
+print("机器人有 " + degree_of_freedom_str + " 个自由度")
 
 # 基本运算符：计算机器人运动总时长
-walk_time = 5   # 前进 5 秒
-back_time = 3   # 后退 3 秒
-total_time = walk_time + back_time
-print("机器人运动总时长:", total_time, "秒")
+frequency = 4  # 重复4次
+walk_time = 5  # 前进 5 秒
+back_time = 3  # 后退 3 秒
+v_m_per_s = 0.3 #速度
+print(f"机器人运行{(walk_time+back_time)*frequency}秒，"
+      f"前进{(walk_time-back_time)*frequency*v_m_per_s}米，"
+      f"平均前进速度为{((walk_time-back_time)*frequency*v_m_per_s)/((walk_time+back_time)*frequency)}米/秒")
 
 ```
 
@@ -445,7 +584,11 @@ print("启动完成 ✅")
 
 ### 类与面向对象基础
 
+> 面向对象就是**把现实世界的事物抽象成对象，用对象的属性（数据）和方法（行为）来组织和管理程序**
+
 #### 类的定义与实例化
+
+定义一个Robot类，定义实例化方法。
 
 ```python
 class Robot:
