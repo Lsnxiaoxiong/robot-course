@@ -811,3 +811,83 @@ robot.charge(30)
 
 
 
+
+
+# temp
+
+## 机器上部署web应用
+
+Flask 是一个轻量级的web "微框架"，非常适合在树莓派这样的设备上运行。
+
+安装Flask和gunicorn
+
+```shell
+pip install flask
+pip install gunicorn
+```
+
+创建app.py文件，编写：
+
+```python
+from flask import Flask, jsonify 
+import hiwonder.ActionGroupControl as AGC
+
+# 初始化Flask应用
+app = Flask(__name__)
+
+# 创建一个API端点来执行动作
+# 可以通过访问 http://<树莓派IP>:5000/run_action/stand 来让机器人站立
+@app.route('/run_action/<string:action_name>', methods=['GET'])
+def run_robot_action(action_name):
+    try:
+        print(f"接收到指令，执行动作: {action_name}")
+        # 直接调用您SDK中的函数
+        # 注意：这里的路径需要是机器人的实际路径，如果SDK默认值正确则无需修改
+        AGC.runAction(action_name)
+        return jsonify({"status": "success", "action": action_name})
+    except Exception as e:
+        print(f"执行动作失败: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+if __name__ == '__main__':
+    # 监听所有网络接口，这样局域网内的设备才能访问
+    app.run(host='0.0.0.0', port=5000)
+```
+
+
+
+启动app：
+
+```shell
+gunicorn --workers 2 --bind 0.0.0.0:5000 app:app
+```
+
+
+
++ --workers 2: 指定了2个工作进程来处理请求，提高了并发能力。对于树莓派5，2到4个工作进程是合理的。
++ --bind 0.0.0.0:5000: 和 app.run() 中的 host 和 port 作用一样，监听所有网络接口的5000端口。
++ app:app: 第一个 app 指的是python文件名 `app.py`，第二个 app 指的是在该文件中创建的 Flask 实例 `app = Flask(__name__)`。
+
+启动后终端输出：
+
+```shell
+❯ gunicorn --worker-class gevent --workers 2 --bind 0.0.0.0:5000 app:app
+/home/pi/.local/lib/python3.11/site-packages/zope/__init__.py:3: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+[2025-09-18 13:51:45 +0800] [4589] [INFO] Starting gunicorn 23.0.0
+[2025-09-18 13:51:45 +0800] [4589] [INFO] Listening at: http://0.0.0.0:5000 (4589)
+[2025-09-18 13:51:45 +0800] [4589] [INFO] Using worker: gevent
+[2025-09-18 13:51:45 +0800] [4590] [INFO] Booting worker with pid: 4590
+[2025-09-18 13:51:45 +0800] [4591] [INFO] Booting worker with pid: 4591
+[2025-09-18 13:51:49 +0800] [4589] [INFO] Handling signal: winch
+
+```
+
+
+
+
+
+
+
+
+

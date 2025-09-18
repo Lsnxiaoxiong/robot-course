@@ -2,7 +2,7 @@
 
 ## python安装
 
-
+> 单独安装python这步可跳过，如果熟悉conda的使用的话。
 
 ### python下载
 
@@ -164,6 +164,136 @@ deactivate
 
 
 
+## Anaconda
+
+### 下载
+
+[官网](https://www.anaconda.com/download/success)，进入[官网仓库](https://repo.anaconda.com/miniconda/) 下载Windows和Linux两个版本，演示电脑为windows系统，树莓派5为arm架构。
+
+下载的两个版本如下图所示：
+
+![image-20250918172035268](01_dev_env_assets/image-20250918172035268.png)
+
+![image-20250918172118179](01_dev_env_assets/image-20250918172118179.png)
+
+
+
+### 安装
+
+#### Windows
+
+点击打开下载完成的安装包，一步步安装即可。![conda](01_dev_env_assets/conda.png)
+
+
+
+#### Linux
+
+将下载的.sh文件移动到Linux系统上。
+
+![image-20250918161648006](01_dev_env_assets/image-20250918161648006.png)
+
+给安装脚本执行权限：
+
+```shell
+chmod +x ./Miniconda3-latest-Linux-aarch64.sh
+```
+
+
+
+运行安装脚本：
+
+```shell
+./Miniconda3-latest-Linux-aarch64.sh
+```
+
+
+
+根据提示操作：
+
+- 会要求你阅读并接受 License，输入 `yes`后退出License页面，再次输入yes，回车。
+- 默认安装路径一般是 `~/miniconda3`，直接回车即可。
+- 会询问是否将 Conda 初始化到 `.bashrc`，输入 `yes`。
+
+
+
+激活环境变量：
+
+```shell
+source ~/.zshrc
+```
+
+
+
+### 验证安装
+
+终端输入：
+
+```shell
+conda --version
+```
+
+或者
+
+```shell
+conda -V
+```
+
+
+
+输出以下内容说明安装成功：
+
+```shell
+C:\Users\lsn>conda -V
+conda 25.5.1
+
+C:\Users\lsn>
+```
+
+
+
+### 可能出现的报错
+
+#### 问题1
+
+运行conda相关命令时出现：
+
+```shell
+Error while loading conda entry point: conda-anaconda-tos (No module named 'pydantic_core._pydantic_core')
+Error while loading conda entry point: anaconda-auth (No module named 'pydantic_core._pydantic_core')
+```
+
+执行下面命令，安装：
+
+```shell
+conda install -n base --force-reinstall pydantic pydantic-core
+```
+
+
+
+#### 问题2
+
+运行conda相关命令时出现：
+
+```shell
+Error while loading conda entry point: conda-anaconda-tos (union_schema() got an unexpected keyword argument 'strict')
+```
+
+卸载pydantic和pydantic-core：
+
+```shell
+# 使用 /usr/bin/python3 -m pip 来确保我们调用的是系统pip
+/usr/bin/python3 -m pip uninstall pydantic pydantic-core
+```
+
+删除文件：
+
+```shell
+rm -rf ~/.local/lib/python3.11/site-packages/pydantic
+rm -rf ~/.local/lib/python3.11/site-packages/pydantic_core
+```
+
+
+
 
 
 ## Nodejs安装
@@ -204,7 +334,7 @@ nodejs是javaScript的运行环境，后续课程使用的mcp需要nodejs环境�
 
  **PowerShell 的执行策略 (Execution Policy)** 限制了脚本运行。默认情况下，Windows 可能会禁止运行 `.ps1` 脚本。
 
-在powershell输入
+在`powershell`输入
 
 ```powershell
 Get-ExecutionPolicy
@@ -563,7 +693,7 @@ copilot是vscode自带的一个AI插件，打开vscode点击右上方的机器�
 
 ## CUDA+cuDNN安装
 
-> 目前下载对应cuda版本的pytorch时，会包含cuda与cuDNN，若不进行cuda相关的编程，不再需要单独下载cuda与cuDNN。
+> 目前下载对应cuda版本的pytorch时，会包含cuda与cuDNN，因此，若不进行cuda相关的编程，不再需要单独下载cuda与cuDNN。
 
 > 这部分的进行，需要电脑安装了英伟达Nvidia的显卡
 
