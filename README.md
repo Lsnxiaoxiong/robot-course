@@ -372,6 +372,14 @@ ssh 用户名@ip
 
 ![image-20250917112110744](README_assets/image-20250917112110744.png)
 
+点击文件夹，选择打开文件夹/home/pi
+
+![image-20250919102559348](README_assets/image-20250919102559348.png)
+
+![image-20250919102627829](README_assets/image-20250919102627829.png)
+
+
+
 
 
 ## 练习
@@ -883,9 +891,143 @@ gunicorn --workers 2 --bind 0.0.0.0:5000 app:app
 
 ```
 
+打开浏览器输入：
+
+```shell
+http:机器人ip:5000/
+```
+
+正常返回json数据，说明启动正常。
+
+![image-20250919112329405](README_assets/image-20250919112329405.png)
 
 
 
+
+
+
+
+# 预设动作
+
+
+
+| 动作名称                   | 动作内容         | 说明 |
+| -------------------------- | ---------------- | -------------------------- |
+| 0                          | 伸展手臂         |  |
+| 16                         | 机械舞1          |  |
+| 17                         | 机械舞2          |  |
+| 18                         | 机械舞3          |  |
+| 19                         | 机械舞4          |  |
+| 20                         | 机械舞5          |  |
+| 21                         | 机械舞6          |  |
+| 22                         | 机械舞7          |  |
+| 23                         | 机械舞8          |  |
+| 24                         | 机械舞9          |  |
+| back_end                   | -                |  |
+| back_fast                  | 向后移动         |  |
+| back_one_step              | 向后移动一步     |  |
+| back_start                 | -                |  |
+| back                       | 小幅向后移动一步 |  |
+| bow                        | 鞠躬             |  |
+| catch_ball_0               | 抱球             |  |
+| catch_ball_go_slow         | 抱球向前走       |  |
+| catch_ball_go_up           | 举球向前走       |  |
+| catch_ball_left_move       | 抱球向左移动     |  |
+| catch_ball_left_move_up    | 举球向左移动     |  |
+| catch_ball_right_move      | 抱球向右移动     |  |
+| catch_ball_right_move_up   | 举球向右移动     |  |
+| catch_ball_turn_left_up    | 举球左转         |  |
+| catch_ball_turn_left       | 抱球左转         |  |
+| catch_ball_turn_right_up   | 举球右转         |  |
+| catch_ball_turn_right      | 抱球右转         |  |
+| catch_ball_up              | 蹲下抱球举起     |  |
+| catch_ball                 | 蹲下抱球站起     |  |
+| chest                      | 向后弯腰，捶胸   |  |
+| climb_stairs_1             | 爬台阶           |  |
+| climb_stairs               | 爬台阶           |  |
+| creep_forward              | 向前爬           |  |
+| down_floor_1               | -                |  |
+| down_floor                 | 下台阶           |  |
+| down_objec                 | 蹲下 |  |
+| go_forward_end             | - |  |
+| go_forward_fast            | 快速向前走 |  |
+| go_forward_one_small_step | 向前移动一小步 |  |
+| go_forward_one_step        | 向前走一步 |  |
+| go_forward_start_fast      | 快速向前走一步 |  |
+| go_forward_start           | 快速向前走一步 |  |
+| go_forward                 | 向前走（走偏） |  |
+| go_hand_up                 | 左手举在胸前，向前走（走偏） |  |
+| go_hand_up1                | 左手举在胸前，向前走 |  |
+| go                         | 双手举到头顶，向前走 |  |
+| grab_left                  | 蹲下双臂张开，左手往胸前收 |  |
+| grab_right                 | 蹲下双臂张开，右手往胸前收 |  |
+| grab_squat_left            | 蹲下，左手放置胸前 |  |
+| grab_squat_right           | 蹲下，右手放置胸前 |  |
+| grab_squat_up_left         | 蹲下起立，抬起左手 |  |
+| grab_squat_up_right        | 蹲下起立，抬起右手 |  |
+| grab_stand_left            | 抬起左手，伸展，放下 |  |
+| grab_stand_right           | 抬起右手，伸展，放下 |  |
+| huibi                      | 抬起左手，放下 |  |
+| hurdles                    | 跨栏 |  |
+| left_hand                  | 小幅度抬起左手 |  |
+| left_kick                  | 向右倾，抬起左脚 |  |
+| left_move_10               | 向左移动小步 |  |
+| left_move_20               | 向左移动小步 |  |
+| left_move_30               | 向左移动小步 |  |
+| left_move_40               | 向左移动 |  |
+| left_move_fast             | 快速向左移动一步 |  |
+| left_move                  | 向左移动一步 |  |
+| left_shot_fast             | 向右倾，左踢腿 |  |
+| left_shot                  | 向右倾，左踢腿 |  |
+| left_uppercut              | 抬右手，伸展左手 |  |
+| lie_down                   | 躺下 |  |
+| lift_down                  | 左手抬到胸前，放下 |  |
+| lift_left_hand             | 左手抬到胸前 |  |
+| lift_up                    | 缓慢左手抬到胸前 |  |
+| move_up                    | 蹲下，抱球，站起，将手举到头顶 | put_up_object恢复站立 |
+| put_down_object            | 蹲下，身体前倾，伸出右手 |  |
+| put_down                   | 蹲下，抱球举起，放下 |  |
+| put_down2                  | 将举到头顶的手放下 |  |
+| put_down3                  | 蹲下，抱球，放开，站起 |  |
+| put_up_object              | 从put_down_object恢复到站立 |  |
+| right_hand                 | 小幅抬起右手，放下 |  |
+| right_kick                 | 身体左倾，抬起右脚，恢复站立 |  |
+| right_move_10              | 向右移动一小步 |  |
+| right_move_20              | 向右移动一小步 |  |
+| right_move_30              | 向右移动一小步 |  |
+| right_move_40              | 向右移动一小步 |  |
+| right_move_fast            | 快速向右移动一步 |  |
+| right_move                 | 向右移动一步 |  |
+| right_shot_fast            | 身体左倾，右踢腿 |  |
+| right_shot                 | 身体左倾，右踢腿 |  |
+| right_uppercut             | 右手抬到胸前，举举起左手 |  |
+| right                      | 在双手举到头顶状态下，右转 |  |
+| seize_down_right           | 右手抬到胸前，放下 |  |
+| seize_right                | 右手抬到胸前 |                       |
+| sit_ups                    | 仰卧起坐 |  |
+| squat_down                 | 伸展双臂，蹲下，手臂环抱 |  |
+| squat_up                   | 蹲下，抬起手臂环抱，站起，伸展手臂，放下 |  |
+| squat                      | 蹲下，手臂环抱 |  |
+| stand_slow                 | 站起 |  |
+| stand_up_back              | 从躺地状态，站起 |  |
+| stand_up_front             | 从趴地状态，站起 |  |
+| stand | 站起 |  |
+| stepping | 原地小踏步 |  |
+| temp1 | 向后走一步 |  |
+| toulan_0 | 双手举起，稍微向下放张开 |  |
+| toulan_a | 双手举到头顶前 |  |
+| toulan_b | 双手举起，稍微向下放张开 |  |
+| turn_left_fast | 向左转 |  |
+| turn_left_small_step_a | 缓慢向左转 |  |
+| turn_left_small_step | 缓慢向左转 |  |
+| turn_left | 向左转 |  |
+| turn_right_fast | 向右转 |  |
+| turn_rifht_small_step_a | 缓慢向右转 |  |
+| turn_rifht_small_step | 缓慢向右转 |  |
+| turn_right | 向右转 |  |
+| twist | 伸展双手，身体左右扭 |  |
+| wave | 抬起右手，摆手 |  |
+| wing_chun | 双手抬到胸前，上下摆臂 |  |
 
 
 
