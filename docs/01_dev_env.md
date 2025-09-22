@@ -172,7 +172,11 @@ deactivate
 
 下载的两个版本如下图所示：
 
-![image-20250918172035268](01_dev_env_assets/image-20250918172035268.png)
+[Miniconda3-py311_25.7.0-2-Windows-x86_64.exe](https://repo.anaconda.com/miniconda/Miniconda3-py311_25.7.0-2-Windows-x86_64.exe)
+
+![image-20250922145609778](01_dev_env_assets/image-20250922145609778.png)
+
+[Miniconda3-py311_25.5.1-1-Linux-aarch64.sh](https://repo.anaconda.com/miniconda/Miniconda3-py311_25.5.1-1-Linux-aarch64.sh)
 
 ![image-20250918172118179](01_dev_env_assets/image-20250918172118179.png)
 
@@ -190,12 +194,12 @@ deactivate
 
 将下载的.sh文件移动到Linux系统上。
 
-![image-20250918161648006](01_dev_env_assets/image-20250918161648006.png)
+![image-20250922145924549](01_dev_env_assets/image-20250922145924549.png)
 
 给安装脚本执行权限：
 
 ```shell
-chmod +x ./Miniconda3-latest-Linux-aarch64.sh
+chmod +x ./Miniconda3-py311_25.5.1-1-Linux-aarch64.sh
 ```
 
 
@@ -203,7 +207,7 @@ chmod +x ./Miniconda3-latest-Linux-aarch64.sh
 运行安装脚本：
 
 ```shell
-./Miniconda3-latest-Linux-aarch64.sh
+./Miniconda3-py311_25.5.1-1-Linux-aarch64.sh
 ```
 
 
@@ -252,6 +256,26 @@ C:\Users\lsn>
 
 
 ### 创建虚拟环境
+
+```shell
+conda create -n myvenv01 python=3.11
+```
+
+
+
+#### 激活环境
+
+```shell
+conda activate myvenv01
+```
+
+
+
+#### 取消激活
+
+```shell
+conda deactivate
+```
 
 
 

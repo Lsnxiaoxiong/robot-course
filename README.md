@@ -639,7 +639,97 @@ robot.charge(30)
 
 ### python控制机器人基本运动
 
+
+
+#### 创建虚拟环境
+
+使用conda创建虚拟环境，激活。进入`/home/pi/TonyPi/HiwonderSDK`路径。
+
+赋予执行权限：
+
+```shell
+chmod +x /home/pi/TonyPi/HiwonderSDK
+```
+
+安装完成：
+
+```shell
+Successfully built hiwonder
+Installing collected packages: hiwonder
+Successfully installed hiwonder-1.0
+```
+
+安装pyserial
+
+```shell
+pip install pyserial -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+```
+
+
+
+创建文件夹：
+
+```shell
+mkdir /home/pi/mysrc
+```
+
+
+
+创建一个test01.py文件，编写：
+
+```python
+import hiwonder.ActionGroupControl as AGC
+AGC.runActionGroup('go_forward_one_step')  
+```
+
+运行程序：
+
+```shell
+python test01.py
+```
+
+如果依赖安装成功，运行时机器人会向前移动。
+
+
+
+#### 直接在机器人上执行
+
+使用vscode连接到机器人：
+
+![image-20250922154833442](README_assets/image-20250922154833442.png)
+
+
+
+
+
+
+
 水平行走、抓握、转头等。
+
+##### 转头
+
+> 上下转动的舵机限制角度在130°左右，左右180°，范围在500-2500之间。
+
+
+```python
+import hiwonder.ros_robot_controller_sdk as rrc
+from hiwonder.Controller import Controller
+
+
+board = rrc.Board()
+ctl = Controller(board)
+
+ctl.set_pwm_servo_pulse(1, 914, 500)
+# ctl.set_pwm_servo_pulse(2, x_dis, 500)
+```
+
+
+
+
+
+
+
+
 
 
 
@@ -830,7 +920,7 @@ Flask 是一个轻量级的web "微框架"，非常适合在树莓派这样的�
 安装Flask和gunicorn
 
 ```shell
-pip install flask
+pip install flask -i https://pypi.tuna.tsinghua.edu.cn/simple
 pip install gunicorn
 ```
 
@@ -984,8 +1074,8 @@ http:机器人ip:5000/
 | lift_down                  | 左手抬到胸前，放下 |  |
 | lift_left_hand             | 左手抬到胸前 |  |
 | lift_up                    | 缓慢左手抬到胸前 |  |
-| move_up                    | 蹲下，抱球，站起，将手举到头顶 | put_up_object恢复站立 |
-| put_down_object            | 蹲下，身体前倾，伸出右手 |  |
+| move_up                    | 蹲下，抱球，站起，将手举到头顶 |  |
+| put_down_object            | 蹲下，身体前倾，伸出右手 | put_up_object恢复站立 |
 | put_down                   | 蹲下，抱球举起，放下 |  |
 | put_down2                  | 将举到头顶的手放下 |  |
 | put_down3                  | 蹲下，抱球，放开，站起 |  |
