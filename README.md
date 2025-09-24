@@ -187,15 +187,47 @@ TonyPi Pro基于树莓派5B开发，它在TonyPi机器人的基础上做了很�
 
 ![image-20250916110152190](README_assets/image-20250916110152190.png)
 
+#### 开机
 
-
-#### 开关机
-
-将机器人背面底部的树莓派扩展板开关由“**OFF**”推动到“**ON**”，此时扩展板的LED1、LED2将常亮，设备开机成功后，蜂鸣器会“嘀”的一声
+将机器人背面底部的树莓派扩展板开关由“**OFF**”推动到“**ON**”，设备开机成功后，蜂鸣器会“嘀”的一声，此时扩展板的LED1、LED2以及树莓派的指示灯都将常亮。
 
 ![image-20250916110921218](README_assets/image-20250916110921218.png)
 
 ![image-20250916110952446](README_assets/image-20250916110952446.png)
+
+![image-20250924111158921](README_assets/image-20250924111158921.png)
+
+
+
+#### 关机
+
+> 关机**不要直接关掉电源开关**，否则再次开机可能出现LED2灯不亮，即网络连接异常。
+
+线连接到机器人，打开终端，输入命令将树莓派先关机：
+
+**立刻关机**
+
+```shell
+sudo shutdown -h now
+```
+
+**延时关机**(30分钟后关机)
+
+```shell
+sudo shutdown -h 30
+```
+
+树莓派关机后，树莓派的指示灯为红灯，扩展版上的LED2灯是灭的，然后再将电源开关关掉。
+
+![image-20250924110415387](README_assets/image-20250924110415387.png)
+
+
+
+
+
+
+
+
 
 #### 电量
 
@@ -309,6 +341,12 @@ TonyPi背部搭载了一个电压显示模块，可实时观察机器人当前�
  ![image-20250916153135373](README_assets/image-20250916153135373.png)
 
 ![image-20250916153232124](README_assets/image-20250916153232124.png)
+
+
+
+#### 网线连接机器人
+
+
 
 
 
@@ -552,6 +590,8 @@ for f in floors:
 
 #### 函数定义与调用
 
+
+
 ```python
 def robot_say(message):
     print("🤖 机器人:", message)
@@ -702,9 +742,75 @@ python test01.py
 
 
 
+##### 行走
+
+TonyPi机器人采用动作文件来管理机器人的肢体动作执行。在`/home/pi/TonyPi/ActionGroups`路径下可以看到预设的动作，简要描述信息可查看[预设动作](#预设动作)。我们通过调用动作文件让机器人执行动作，从而控制机器人。
+
+![image-20250923130533667](README_assets/image-20250923130533667.png)
 
 
-水平行走、抓握、转头等。
+
+**向前走**
+
+```python
+import hiwonder.ActionGroupControl as AGC
+
+AGC.runActionGroup('go_forward_one_step', times=2, with_stand=True)                         
+# 第二个参数为运行动作次数，默认1, 当为0时表示循环运行， 第三个参数表示最后是否以立正姿态收步
+
+```
+
+
+
+**停止运行**
+
+```python
+threading.Thread(target=AGC.runActionGroup, args=('go_forward', 0, True)).start()  
+# 运行动作函数是阻塞式的，如果要循环运行一段时间后停止，请用线程来开启
+time.sleep(3)
+AGC.stopActionGroup()  # 前进3秒后停止
+```
+
+
+
+
+
+**向后走**
+
+```python
+import hiwonder.ActionGroupControl as AGC
+
+
+AGC.runActionGroup('back_one_step')
+```
+
+
+
+**向左走**
+
+```python
+import hiwonder.ActionGroupControl as AGC
+
+
+AGC.runActionGroup('left_move')
+```
+
+
+
+**向右走**
+
+```python
+import hiwonder.ActionGroupControl as AGC
+
+
+AGC.runActionGroup('right_move')
+```
+
+
+
+
+
+
 
 ##### 转头
 
@@ -719,13 +825,296 @@ from hiwonder.Controller import Controller
 board = rrc.Board()
 ctl = Controller(board)
 
-ctl.set_pwm_servo_pulse(1, 914, 500)
-# ctl.set_pwm_servo_pulse(2, x_dis, 500)
+ctl.set_pwm_servo_pulse(1, 1700, 500) # 上下转头
+ctl.set_pwm_servo_pulse(2, 1400, 500) # 左右转头
+```
+
+三个参数：
+
++ servo_id: 要驱动的舵机id(the servo id needed to be driven)
+
++ pulse:   舵机目标位置(servo target position)
+
++ use_time: 转动需要的时间(the time needed to rotate)
+
+
+
+#### 在电脑上远程控制机器人
+
+由于Tonypi机器人的SDK是直接控制舵机，将SDK安装到电脑上是无法正常使用的，因此我们使用web框架在机器人上创建一个web应用，通过web应用间距控制机器人。
+
+
+
+##### 安装Flask
+
+Flask 是一个轻量级的web "微框架"，非常适合在树莓派这样的设备上运行。
+
+安装Flask和gunicorn：
+
+```shell
+pip install flask -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install gunicorn
+```
+
+创建app.py文件，编写：
+
+```python
+from flask import Flask, jsonify 
+import hiwonder.ActionGroupControl as AGC
+
+# 初始化Flask应用
+app = Flask(__name__)
+
+# 创建一个API端点来执行动作
+# 可以通过访问 http://<树莓派IP>:5000/run_action/stand 来让机器人站立
+@app.route('/run_action/<string:action_name>', methods=['GET'])
+def run_robot_action(action_name):
+    try:
+        print(f"接收到指令，执行动作: {action_name}")
+        # 直接调用您SDK中的函数
+        # 注意：这里的路径需要是机器人的实际路径，如果SDK默认值正确则无需修改
+        AGC.runAction(action_name)
+        return jsonify({"status": "success", "action": action_name})
+    except Exception as e:
+        print(f"执行动作失败: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+if __name__ == '__main__':
+    # 监听所有网络接口，这样局域网内的设备才能访问
+    app.run(host='0.0.0.0', port=5000)
+```
+
+
+
+启动app：
+
+```shell
+gunicorn --workers 4 --timeout 600 --bind 0.0.0.0:5000 app:app
+```
+
+
+
++ --workers 2: 指定了2个工作进程来处理请求，提高了并发能力。对于树莓派5，2到4个工作进程是合理的。
++ --timeout 600：设置超时时间，600s。
++ --bind 0.0.0.0:5000: 和 app.run() 中的 host 和 port 作用一样，监听所有网络接口的5000端口。
++ app:app: 第一个 app 指的是python文件名 `app.py`，第二个 app 指的是在该文件中创建的 Flask 实例 `app = Flask(__name__)`。
+
+启动后终端输出：
+
+```shell
+❯ gunicorn --worker-class gevent --workers 2 --bind 0.0.0.0:5000 app:app
+/home/pi/.local/lib/python3.11/site-packages/zope/__init__.py:3: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+[2025-09-18 13:51:45 +0800] [4589] [INFO] Starting gunicorn 23.0.0
+[2025-09-18 13:51:45 +0800] [4589] [INFO] Listening at: http://0.0.0.0:5000 (4589)
+[2025-09-18 13:51:45 +0800] [4589] [INFO] Using worker: gevent
+[2025-09-18 13:51:45 +0800] [4590] [INFO] Booting worker with pid: 4590
+[2025-09-18 13:51:45 +0800] [4591] [INFO] Booting worker with pid: 4591
+[2025-09-18 13:51:49 +0800] [4589] [INFO] Handling signal: winch
+
+```
+
+打开浏览器输入：
+
+```shell
+http:机器人ip:5000/
+```
+
+正常返回json数据，说明启动正常。
+
+![image-20250919112329405](README_assets/image-20250919112329405.png)
+
+
+
+##### 控制运动
+
+浏览器输入：
+
+```shell
+http://机器人IP:5000/run_action/go_forward_one_step
+```
+
+可以看到机器人执行了动作，向前走了一步。以此类推，可以执行其它动作。
+
+
+
+##### 控制转头
+
+添加控制转头的代码，启动程序。
+
+```python
+from flask import Flask, jsonify, request
+import hiwonder.ActionGroupControl as AGC
+import hiwonder.ros_robot_controller_sdk as rrc
+from hiwonder.Controller import Controller
+
+# 初始化Flask应用
+app = Flask(__name__)
+board = rrc.Board()
+ctl = Controller(board)
+
+
+# 创建一个API端点来执行动作
+# 可以通过访问 http://<树莓派IP>:5000/run_action/stand 来让机器人站立
+@app.route('/run_action/<string:action_name>', methods=['GET'])
+def run_robot_action(action_name):
+    try:
+        print(f"接收到指令，执行动作: {action_name}")
+        # 直接调用您SDK中的函数
+        # 注意：这里的路径需要是机器人的实际路径，如果SDK默认值正确则无需修改
+        AGC.runAction(action_name)
+        return jsonify({"status": "success", "action": action_name})
+    except Exception as e:
+        print(f"执行动作失败: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route('/turn_head', methods=['POST'])
+def turn_head():
+    req_data = request.get_json()
+    servo_id = req_data.get('servo_id')
+    pulse = req_data.get('pulse')
+    ctl.set_pwm_servo_pulse(servo_id, pulse, 500)
+    return jsonify({"status": "success", "servo_id": servo_id, "pulse": pulse})
+
+
+if __name__ == '__main__':
+    # 监听所有网络接口，这样局域网内的设备才能访问
+    app.run(host='0.0.0.0', port=5000)
+```
+
+控制转头的程序使用POST请求举例，不过浏览器不能直接发送POST请求，所以可以使用cmd终端或者[http请求调试工具](./docs/01_dev_env.md#http请求调试工具)，这里以Apifox为例：
+
+![image-20250923154112592](README_assets/image-20250923154112592.png)
+
+
+
+##### 停止端点
+
+```python
+@app.route('/stop', methods=['GET'])
+def stop_action():
+    try:
+        AGC.stopActionGroup()
+        return jsonify({"status": "success", "message": "动作已停止"})
+    except Exception as e:
+        print(f"停止动作失败: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
 ```
 
 
 
 
+
+## 多线程与继承
+
+**线程**是操作系统调度的最小执行单元。**多线程**就是在同一个进程中运行多个线程，可以同时执行不同任务。在 Python 中，使用 `threading` 模块来实现。
+
+
+
+### 基本线程创建
+
+```python
+import hiwonder.ActionGroupControl as AGC
+import hiwonder.ros_robot_controller_sdk as rrc
+from hiwonder.Controller import Controller
+import threading
+import time
+
+board = rrc.Board()
+ctl = Controller(board)
+
+def worker(servo_id, pulse):
+    ctl.set_pwm_servo_pulse(servo_id, pulse, 1000)
+
+# 创建线程
+t1 = threading.Thread(target=worker, args=(1, 1700))
+t2 = threading.Thread(target=AGC.runAction, args=("go_forward_one_step",))
+
+t1.start()
+t2.start()
+
+t1.join()  # 等待 t1 执行完成
+t2.join()
+print("执行完成")
+
+```
+
+执行程序，可以看到，机器人一边向前走，一边转头。
+
+
+
+### 使用类继承
+
+当功能需求较复杂时，可以继承Thread类来进行实现。以下情况可以考虑使用类继承：
+
++ 需要在线程对象里保存状态、返回值或异常。
+
++ 需要封装一个“长期运行”的工作线程（比如消费者/监听器），并提供 start/stop 等方法。
+
++ 需要在 run 里加统一的前后处理（日志、计时、资源初始化/清理）。
+
++ 需要把线程作为更大类层次的一部分，复用面向对象接口。
+
+
+
+下面是一个启动（停止）机器人向前行走的例子：
+
+`thread_control.py`
+
+```python
+import threading
+import time
+import hiwonder.ActionGroupControl as AGC
+
+class WalkController(threading.Thread):
+    def __init__(self, name):
+        threading.Thread.__init__(self)
+        self.name = name
+        self._run_event = threading.Event()
+        self._run_event.set()
+        self._stop_event = threading.Event()
+        
+    def run(self):
+        while not self._stop_event.is_set():
+            if self._run_event.wait():
+                AGC.runActionGroup('go_forward_one_step')
+            
+    def pause(self):
+        self._run_event.clear()
+        AGC.stopActionGroup() 
+
+    def resume(self):
+        self._run_event.set()
+
+    def stop(self):
+        self._stop_event.set()
+        self._run_event.set()
+
+
+if __name__ == "__main__":
+    walk_controller = WalkController("WalkController")
+    walk_controller.start()
+    time.sleep(3)  
+    walk_controller.pause()
+    time.sleep(2)  
+    walk_controller.resume()
+    time.sleep(3)  
+    walk_controller.stop()
+
+```
+
+运行程序，可以看到机器人向前行走3秒后，暂停2秒，然后再次行走3秒后结束。
+
+> 上面的例子已经可以实现机器人的启动、暂停、停止。但是有一个问题：这个实例只能执行一次，一旦停止，就没法再次启动了。
+
+
+
+### 实现可重复启停的机器人控制器
+
+
+
+在`app.py`添加新端点：
 
 
 
@@ -735,7 +1124,7 @@ ctl.set_pwm_servo_pulse(1, 914, 500)
 
 ## 练习
 
-+ 利用AI，自行了解容器：
++ 利用AI，自行了解容器相关内容：
   + 增删改查
   + 列表：切片、列表推导式、解包等
   + 字典：字典推导式、合并字典、解包等
@@ -909,95 +1298,9 @@ ctl.set_pwm_servo_pulse(1, 914, 500)
 
 
 
+# 附录
 
-
-# temp
-
-## 机器上部署web应用
-
-Flask 是一个轻量级的web "微框架"，非常适合在树莓派这样的设备上运行。
-
-安装Flask和gunicorn
-
-```shell
-pip install flask -i https://pypi.tuna.tsinghua.edu.cn/simple
-pip install gunicorn
-```
-
-创建app.py文件，编写：
-
-```python
-from flask import Flask, jsonify 
-import hiwonder.ActionGroupControl as AGC
-
-# 初始化Flask应用
-app = Flask(__name__)
-
-# 创建一个API端点来执行动作
-# 可以通过访问 http://<树莓派IP>:5000/run_action/stand 来让机器人站立
-@app.route('/run_action/<string:action_name>', methods=['GET'])
-def run_robot_action(action_name):
-    try:
-        print(f"接收到指令，执行动作: {action_name}")
-        # 直接调用您SDK中的函数
-        # 注意：这里的路径需要是机器人的实际路径，如果SDK默认值正确则无需修改
-        AGC.runAction(action_name)
-        return jsonify({"status": "success", "action": action_name})
-    except Exception as e:
-        print(f"执行动作失败: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-if __name__ == '__main__':
-    # 监听所有网络接口，这样局域网内的设备才能访问
-    app.run(host='0.0.0.0', port=5000)
-```
-
-
-
-启动app：
-
-```shell
-gunicorn --workers 2 --bind 0.0.0.0:5000 app:app
-```
-
-
-
-+ --workers 2: 指定了2个工作进程来处理请求，提高了并发能力。对于树莓派5，2到4个工作进程是合理的。
-+ --bind 0.0.0.0:5000: 和 app.run() 中的 host 和 port 作用一样，监听所有网络接口的5000端口。
-+ app:app: 第一个 app 指的是python文件名 `app.py`，第二个 app 指的是在该文件中创建的 Flask 实例 `app = Flask(__name__)`。
-
-启动后终端输出：
-
-```shell
-❯ gunicorn --worker-class gevent --workers 2 --bind 0.0.0.0:5000 app:app
-/home/pi/.local/lib/python3.11/site-packages/zope/__init__.py:3: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-  import pkg_resources
-[2025-09-18 13:51:45 +0800] [4589] [INFO] Starting gunicorn 23.0.0
-[2025-09-18 13:51:45 +0800] [4589] [INFO] Listening at: http://0.0.0.0:5000 (4589)
-[2025-09-18 13:51:45 +0800] [4589] [INFO] Using worker: gevent
-[2025-09-18 13:51:45 +0800] [4590] [INFO] Booting worker with pid: 4590
-[2025-09-18 13:51:45 +0800] [4591] [INFO] Booting worker with pid: 4591
-[2025-09-18 13:51:49 +0800] [4589] [INFO] Handling signal: winch
-
-```
-
-打开浏览器输入：
-
-```shell
-http:机器人ip:5000/
-```
-
-正常返回json数据，说明启动正常。
-
-![image-20250919112329405](README_assets/image-20250919112329405.png)
-
-
-
-
-
-
-
-# 预设动作
+## 预设动作
 
 
 

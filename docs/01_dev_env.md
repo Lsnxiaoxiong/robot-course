@@ -122,9 +122,11 @@
 
 ### 创建虚拟环境
 
+> 后续使用conda进行管理虚拟环境。
+
 不同版本的python、第三方库会依赖不同的库，直接使用pip会在全局python环境中安装库，这会导致不同版本库之间的兼容问题，所以建议为每一个项目单独创建一个虚拟环境，在虚拟环境中安装所需的库。
 
-进入项目目录，在终端输入
+进入项目目录，在终端输入：
 
 ```shell
 python -m venv .venv
@@ -165,6 +167,8 @@ deactivate
 
 
 ## Anaconda
+
+我们主要使用其中的conda来进行虚拟环境管理，以避免与机器人现有环境冲突。
 
 ### 下载
 
@@ -259,6 +263,14 @@ C:\Users\lsn>
 
 ```shell
 conda create -n myvenv01 python=3.11
+```
+
+
+
+#### 列出已有虚拟环境
+
+```shell
+conda env list
 ```
 
 
@@ -1228,3 +1240,60 @@ FinalShell集成远程连接与文件传输。[官网](https://www.hostbuf.com/t
 ![image-20250825160522664](01_dev_env_assets/image-20250825160522664.png)
 
 ![image-20250825160554113](01_dev_env_assets/image-20250825160554113.png)
+
+
+
+
+
+## Http请求调试工具
+
+### Postman
+
+[官网](https://www.postman.com/)，点击下载对应版本即可。
+
+![image-20250923142633546](01_dev_env_assets/image-20250923142633546.png)
+
+
+
+### Apifox
+
+[官网](https://apifox.com/?utm_source=baidu&utm_medium=sem&utm_campaign=352505605&utm_content=8777274745&utm_term=apifox&bd_vid=10546342228545602496)，点击下载对应版本即可。
+
+![image-20250923142816992](01_dev_env_assets/image-20250923142816992.png)
+
+
+
+#### 发送请求
+
+随便创建一个项目：
+
+![image-20250923143246629](01_dev_env_assets/image-20250923143246629.png)
+
+![image-20250923143309309](01_dev_env_assets/image-20250923143309309.png)
+
+
+
+点击创建“快捷请求”：
+
+![image-20250923143421172](01_dev_env_assets/image-20250923143421172.png)
+
+
+
+选择请求类型、输入url、参数/请求体：
+
+![image-20250923143457333](01_dev_env_assets/image-20250923143457333.png)
+
+
+
+#### get请求
+
+![image-20250923143804501](01_dev_env_assets/image-20250923143804501.png)
+
+
+
+#### post请求
+
+![image-20250923143857336](01_dev_env_assets/image-20250923143857336.png)
+
+
+
