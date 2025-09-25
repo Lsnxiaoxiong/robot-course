@@ -346,6 +346,122 @@ TonyPi背部搭载了一个电压显示模块，可实时观察机器人当前�
 
 #### 网线连接机器人
 
+以windows系统为例演示。
+
+##### 网线连接电脑与机器人
+
+拆开机器人后盖，可以在机器人右侧看见一个网口，将网线连接即可。
+
+![image-20250925100455942](README_assets/image-20250925100455942.png)
+
+
+
+
+
+##### 配置网络共享
+
+先让电脑连接到一个网络，这个网络不占用网口，比如无线网络WLAN。
+
+按下WIN搜索“控制面板”，或者WIN+R输入control，打开控制面板。
+
+点击“网络和Internet”——“网络和共享中心”——“更改适配器设置”，可以看到两个网路适配器：
+
++ 连接的WLAN，也就是WIFI
++ 连接的机器人
+
+选中WLAN适配器，鼠标单击右键，点击“属性”——“共享”，两个选项都勾选，选择机器人连接的网络适配器，点击确认。
+
+共享之后，可以看见WLAN会提示“共享的”。
+
+![share_net](README_assets/share_net.png)
+
+
+
+##### 共享失败
+
+Windows网络共享后，使用共享网络的适配器（也就是连接机器人的网络适配器）ip会变为`192.168.137.1`。需要检查是否有其它网络适配器占用了这个ip。
+
+选择网络适配器，右键单击鼠标，点击“Internet协议版本4（TCP/IPv4）”，即可查看当前适配器的ip，如果被占用了，需要将ip改为其它非`192.168.137.1`的ip地址。
+
+![image-20250925110629505](README_assets/image-20250925110629505.png)
+
+![image-20250925110322010](README_assets/image-20250925110322010.png)
+
+
+
+##### 查找机器人ip
+
+打开电脑命令行终端，输入：
+
+```shell
+arp -a
+```
+
+
+
+可以看到一系列接口：
+
+```shell
+C:\Users\lsn>arp -a
+
+接口: 192.168.5.1 --- 0xe
+  Internet 地址         物理地址              类型
+  192.168.5.255         ff-ff-ff-ff-ff-ff     静态
+  224.0.0.2             01-00-5e-00-00-02     静态
+  224.0.0.22            01-00-5e-00-00-16     静态
+  224.0.0.251           01-00-5e-00-00-fb     静态
+  224.0.0.252           01-00-5e-00-00-fc     静态
+  224.0.1.129           01-00-5e-00-01-81     静态
+  239.255.255.250       01-00-5e-7f-ff-fa     静态
+  255.255.255.255       ff-ff-ff-ff-ff-ff     静态
+
+接口: 192.168.123.1 --- 0x12
+  Internet 地址         物理地址              类型
+  192.168.123.255       ff-ff-ff-ff-ff-ff     静态
+  224.0.0.2             01-00-5e-00-00-02     静态
+  224.0.0.22            01-00-5e-00-00-16     静态
+  224.0.0.251           01-00-5e-00-00-fb     静态
+  224.0.0.252           01-00-5e-00-00-fc     静态
+  224.0.1.129           01-00-5e-00-01-81     静态
+  239.255.255.250       01-00-5e-7f-ff-fa     静态
+  255.255.255.255       ff-ff-ff-ff-ff-ff     静态
+  ...
+```
+
+
+
+找到`192.168.137.1`开头的接口，第一个192.168.137开头的ip，也就是`192.168.137.95`为机器人ip。
+
+![image-20250925111132310](README_assets/image-20250925111132310.png)
+
+命令行终端输入：
+
+```shell
+ssh pi@192.168.137.95
+```
+
+然后输入密码`raspberrypi`，即可远程登录。
+
+```shell
+C:\Users\lsn>ssh pi@192.168.137.95
+pi@192.168.137.95's password:
+Linux raspberrypi 6.6.74+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.6.74-1+rpt1 (2025-01-27) aarch64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Thu Sep 25 12:33:05 2025
+|MACHINE|MIC_TYPE|: |TonyPi|WonderEchoPro|
+ASR_LANGUAGE: Chinese
+VERSION: |V1.0|2025-04-21|
+zsh: corrupt history file /home/pi/.zsh/.zsh_history
+╭─  │  ~                                                                  ✔ │ base  │ pi@raspberrypi │ 12:41:42 
+╰─
+```
+
 
 
 
@@ -1082,7 +1198,7 @@ class WalkController(threading.Thread):
             
     def pause(self):
         self._run_event.clear()
-        AGC.stopActionGroup() 
+        AGC.stopActionGroup()
 
     def resume(self):
         self._run_event.set()
@@ -1115,6 +1231,164 @@ if __name__ == "__main__":
 
 
 在`app.py`添加新端点：
+
+
+
+## 代码规范
+
+
+
+### 类型注解
+
+#### 基础规则
+
+- **方法入参、返回值必须标注类型**（即使是 `None`）。
+- **类属性推荐声明类型**，特别是在 `__init__` 里初始化的字段。
+- **局部变量类型可省略**，除非类型复杂或 IDE 难以推导。
+- **异常类/装饰器/生成器/协程** 要显式标明类型。
+- 使用 **标准库 typing** / **collections.abc**（Python 3.9+）的现代写法。
+
+
+
+#### 函数/方法签名
+
++ **入参类型 + 默认值**：`Optional[float] = None`
+
++ **返回值类型**：明确标注 `-> bool`
+
++ **文档字符串**：描述参数与返回值含义
+
+```python
+from typing import Optional
+
+def connect(host: str, port: int, timeout: Optional[float] = None) -> bool:
+    """建立连接
+    
+    Args:
+        host: 服务器主机名
+        port: 端口号
+        timeout: 超时时间（秒），默认为 None
+
+    Returns:
+        bool: 连接是否成功
+    """
+    ...
+
+```
+
+
+
+#### 类定义
+
++ **类属性注解**：`status: ActionEnum`、`_thread: Thread | None`
+
++ **构造方法返回值**：`__init__(...) -> None`
+
++ **所有方法都标注返回类型**
+
+```python
+import threading
+from enum import Enum
+
+class ActionEnum(str, Enum):
+    INIT = "init"
+    RUNNING = "running"
+    STOPPED = "stopped"
+
+class Action:
+    status: ActionEnum
+    _thread: threading.Thread | None
+    _run_event: threading.Event
+
+    def __init__(self) -> None:
+        self.status = ActionEnum.INIT
+        self._thread = None
+        self._run_event = threading.Event()
+
+    def can_start(self) -> bool:
+        return self.status == ActionEnum.INIT and (
+            self._thread is None or not self._thread.is_alive()
+        )
+
+    def start(self) -> None:
+        if not self.can_start():
+            return
+        self.status = ActionEnum.RUNNING
+        self._thread = threading.Thread(target=self.run, name="action-thread")
+        self._thread.start()
+
+    def run(self) -> None:
+        ...
+
+```
+
+
+
+#### 集合与泛型
+
+```python
+from collections.abc import Callable
+
+# 字典
+users: dict[int, str] = {}
+
+# 列表
+tasks: list[str] = []
+
+# 可调用对象
+callback: Callable[[int, str], bool]  # (int, str) -> bool
+
+```
+
+
+
+#### 异步与生成器
+
+```python
+from collections.abc import AsyncGenerator, Generator
+
+async def fetch_data() -> str:
+    ...
+
+def read_lines(path: str) -> Generator[str, None, None]:
+    with open(path) as f:
+        for line in f:
+            yield line
+
+async def stream_data() -> AsyncGenerator[str, None]:
+    yield "hello"
+
+```
+
+
+
+#### 装饰器
+
+```python
+from typing import TypeVar, Callable, ParamSpec
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+def log_call(func: Callable[P, R]) -> Callable[P, R]:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        print(f"Calling {func.__name__}")
+        return func(*args, **kwargs)
+    return wrapper
+
+```
+
+
+
+#### 错误与异常
+
+```python
+class ActionError(Exception):
+    """表示 Action 执行失败的异常"""
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+
+```
 
 
 

@@ -14,21 +14,51 @@ class ActionEnum(Enum):
 
 
 class Action:
+    status: ActionEnum
+    _thread: threading.Thread | None
+    _run_event: threading.Event()
+    _stop_event: threading.Event()
+    name: str
+    lock: threading.Lock()
+
     def __init__(self, name="undefined"):
         self.status = ActionEnum.INIT
         self._thread = None
         self._run_event = threading.Event()
         self._stop_event = threading.Event()
         self.name = name
+        self.lock = threading.Lock()
+
+    def is_init_status(self):
+        return self.status == ActionEnum.INIT
 
     def is_undefined(self):
         return self.name == "undefined"
 
+    def is_running(self):
+        return self.status == ActionEnum.RUNNING
+
+    def is_paused(self):
+        return self.status == ActionEnum.PAUSED
+
+    def is_stopped(self):
+        return self._stop_event.is_set()
+
+    def can_start(self):
+        return (self.is_init_status() and
+                (self._thread is None or not self._thread.is_alive()))
+
     def start(self):
-        self.status = ActionEnum.RUNNING
-        self._thread = threading.Thread(target=self.proxy_method, name=f"{self.name}-thread")
-        self._run_event.set()
-        self._thread.start()
+
+        if not self.can_start():
+            return
+        with self.lock:
+            if not self.can_start():
+                return
+            self.status = ActionEnum.RUNNING
+            self._thread = threading.Thread(target=self.proxy_method, name=f"{self.name}-thread")
+            self._run_event.set()
+            self._thread.start()
 
     def pause(self):
         self.status = ActionEnum.PAUSED
@@ -47,20 +77,20 @@ class Action:
     def stop(self):
         self.before_stop()
         self.status = ActionEnum.STOPPED
-        self._run_event.clear()
         self._stop_event.set()
+        self._run_event.set()
         if self._thread:
             self._thread.join()
         self._thread = None
 
-    def is_stopped(self):
-        return self._stop_event.is_set()
-
-    def proxy_method(self):
+    def proxy_method(self) -> None:
+        """
+        eg:
+        while not self.is_stopped():
+            for i in range(100):
+                self.check_pause()
+                print(i)
+                time.sleep(1)
+        :return: None
+        """
         raise NotImplementedError("Please implement the proxy_method in subclass")
-        # eg:
-        # while not self.is_stopped():
-        #     for i in range(100):
-        #         self.check_pause()
-        #         print(i)
-        #         time.sleep(1)
