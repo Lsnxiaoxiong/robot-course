@@ -1249,9 +1249,27 @@ FinalShell集成远程连接与文件传输。[官网](https://www.hostbuf.com/t
 
 ### Postman
 
-[官网](https://www.postman.com/)，点击下载对应版本即可。
+[官网](https://www.postman.com/)，点击下载对应版本即可。安装后需要注册账号登录。
 
 ![image-20250923142633546](01_dev_env_assets/image-20250923142633546.png)
+
+
+
+#### 演示
+
+##### get请求
+
+点击“加号”新建一个请求，选择GET请求，输入url，参数，点击Send即可。
+
+![image-20250926133548274](01_dev_env_assets/image-20250926133548274.png)
+
+
+
+##### Post请求
+
+选择POST请求，输入url，点击Body选择raw，格式选择JSON，输入参数后，点击Send即可。
+
+![image-20250926133751494](01_dev_env_assets/image-20250926133751494.png)
 
 
 
@@ -1263,7 +1281,7 @@ FinalShell集成远程连接与文件传输。[官网](https://www.hostbuf.com/t
 
 
 
-#### 发送请求
+#### 演示
 
 随便创建一个项目：
 
@@ -1285,13 +1303,13 @@ FinalShell集成远程连接与文件传输。[官网](https://www.hostbuf.com/t
 
 
 
-#### get请求
+##### get请求
 
 ![image-20250923143804501](01_dev_env_assets/image-20250923143804501.png)
 
 
 
-#### post请求
+##### post请求
 
 ![image-20250923143857336](01_dev_env_assets/image-20250923143857336.png)
 

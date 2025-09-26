@@ -233,6 +233,162 @@ Python 3.5+ 引入类型提示（PEP 484），现代项目强烈建议对所有�
 
 ------
 
+### 实践
+
+#### 基础规则
+
+- **方法入参、返回值必须标注类型**（即使是 `None`）。
+- **类属性推荐声明类型**，特别是在 `__init__` 里初始化的字段。
+- **局部变量类型可省略**，除非类型复杂或 IDE 难以推导。
+- **异常类/装饰器/生成器/协程** 要显式标明类型。
+- 使用 **标准库 typing** / **collections.abc**（Python 3.9+）的现代写法。
+
+
+
+#### 函数/方法签名
+
++ **入参类型 + 默认值**：`Optional[float] = None`
+
++ **返回值类型**：明确标注 `-> bool`
+
++ **文档字符串**：描述参数与返回值含义
+
+```python
+from typing import Optional
+
+def connect(host: str, port: int, timeout: Optional[float] = None) -> bool:
+    """建立连接
+    
+    Args:
+        host: 服务器主机名
+        port: 端口号
+        timeout: 超时时间（秒），默认为 None
+
+    Returns:
+        bool: 连接是否成功
+    """
+    ...
+
+```
+
+
+
+#### 类定义
+
++ **类属性注解**：`status: ActionEnum`、`_thread: Thread | None`
+
++ **构造方法返回值**：`__init__(...) -> None`
+
++ **所有方法都标注返回类型**
+
+```python
+import threading
+from enum import Enum
+
+class ActionEnum(str, Enum):
+    INIT = "init"
+    RUNNING = "running"
+    STOPPED = "stopped"
+
+class Action:
+    status: ActionEnum
+    _thread: threading.Thread | None
+    _run_event: threading.Event
+
+    def __init__(self) -> None:
+        self.status = ActionEnum.INIT
+        self._thread = None
+        self._run_event = threading.Event()
+
+    def can_start(self) -> bool:
+        return self.status == ActionEnum.INIT and (
+            self._thread is None or not self._thread.is_alive()
+        )
+
+    def start(self) -> None:
+        if not self.can_start():
+            return
+        self.status = ActionEnum.RUNNING
+        self._thread = threading.Thread(target=self.run, name="action-thread")
+        self._thread.start()
+
+    def run(self) -> None:
+        ...
+
+```
+
+
+
+#### 集合与泛型
+
+```python
+from collections.abc import Callable
+
+# 字典
+users: dict[int, str] = {}
+
+# 列表
+tasks: list[str] = []
+
+# 可调用对象
+callback: Callable[[int, str], bool]  # (int, str) -> bool
+
+```
+
+
+
+#### 异步与生成器
+
+```python
+from collections.abc import AsyncGenerator, Generator
+
+async def fetch_data() -> str:
+    ...
+
+def read_lines(path: str) -> Generator[str, None, None]:
+    with open(path) as f:
+        for line in f:
+            yield line
+
+async def stream_data() -> AsyncGenerator[str, None]:
+    yield "hello"
+
+```
+
+
+
+#### 装饰器
+
+```python
+from typing import TypeVar, Callable, ParamSpec
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+def log_call(func: Callable[P, R]) -> Callable[P, R]:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        print(f"Calling {func.__name__}")
+        return func(*args, **kwargs)
+    return wrapper
+
+```
+
+
+
+#### 错误与异常
+
+```python
+class ActionError(Exception):
+    """表示 Action 执行失败的异常"""
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+
+```
+
+
+
+
+
 
 
 ## 6. 函数与类设计
@@ -301,7 +457,7 @@ with open("my_file.txt", "r", encoding="utf-8") as f:
 
 ### 7.3 日志与错误观测
 
-生产代码禁止使用 print；以 logging 作为标准观测通道，模块内 logger = logging.getLogger(__name__)。日志包含业务关键上下文（幂等键、用户/租户标识、请求 ID），并避免泄露敏感信息。异常处理要么吞吐并补救，要么记录并向上抛出；禁止无条件 pass。与可观测性平台（如 OpenTelemetry）集成时，注意日志级别与速率控制，避免日志风暴。
+生产代码禁止使用 print。以 logging 作为标准观测通道，模块内 logger = logging.getLogger(__name__)。日志包含业务关键上下文（幂等键、用户/租户标识、请求 ID），并避免泄露敏感信息。异常处理要么吞吐并补救，要么记录并向上抛出；禁止无条件 pass。与可观测性平台（如 OpenTelemetry）集成时，注意日志级别与速率控制，避免日志风暴。
 
 ------
 
@@ -369,24 +525,6 @@ with open("my_file.txt", "r", encoding="utf-8") as f:
 #### 主流 Python 工具最新稳定版本（来源：PyPI JSON API）
 
 **表 2 工具与用途及当前稳定版本（来源：PyPI JSON API）**
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 | 工具           | 用途              | 最新稳定版本 |
 | -------------- | ----------------- | ------------ |
