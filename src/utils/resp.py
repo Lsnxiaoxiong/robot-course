@@ -1,11 +1,25 @@
 
-from typing import Any, TypeVar
+from dataclasses import dataclass
+from typing import Any, Optional, TypeVar
 
 from flask import json, jsonify, Response, current_app
 
 
 from src.utils.annotation import enforce_types
-from src.w02.robot_manager import RobotRespCodeEnum
+from src.utils.robot_enum import RobotRespCode
+
+@dataclass
+class CanStartResult:
+    can_start: bool
+    resp_code: Optional[RobotRespCode] = None
+
+    @staticmethod
+    def success() -> 'CanStartResult':
+        return CanStartResult(True, None)
+
+    @staticmethod
+    def failed( resp_code: RobotRespCode) -> 'CanStartResult':
+        return CanStartResult(False, resp_code)
 
 
 class Result:
@@ -19,7 +33,7 @@ class Result:
 
     @enforce_types
     @staticmethod
-    def failed(robot_resp_code: RobotRespCodeEnum) -> Response:
+    def failed(robot_resp_code: RobotRespCode) -> Response:
         return Result(robot_resp_code.value, robot_resp_code.name, None).to_json()
 
     def to_json(self) -> Response:

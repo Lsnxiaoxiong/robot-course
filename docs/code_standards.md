@@ -106,6 +106,9 @@
 | **私有成员**  | 前缀单下划线                | _cache, _load_config()            | 无约定或误用双下划线           |
 | **强私有**    | 前缀双下划线（名称改编）    | __secret_key                      | 误用于普通私有场景             |
 | **临时变量**  | _（单下划线）               | for _ in range(5)                 | 使用有歧义的 x1, x2            |
+|**枚举类**	|PascalCase|	Status, OrderType, UserRole|	status, ORDER_TYPE, userRole|
+|**枚举成员**	|UPPER_SNAKE_CASE|	PENDING, IN_PROGRESS, COMPLETED|	Pending, inProgress, completed|
+
 
 ### 2.3 特殊命名约定
 
