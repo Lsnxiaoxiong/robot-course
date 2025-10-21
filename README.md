@@ -648,7 +648,7 @@ Pro不仅保留了之前所有的功能，还拓展出了更多有趣的AI创意
 视觉抓取等二次开发提供快速、便捷的集成方案。
 """
 
-print("欢迎来到人形机器人实验室！")
+# print("欢迎来到人形机器人实验室！")
 print("今天的主角是"+" TonyPi"+" 机器人")
 
 ```
@@ -730,7 +730,6 @@ v_m_per_s = 0.3 #速度
 print(f"机器人运行{(walk_time+back_time)*frequency}秒，"
       f"前进{(walk_time-back_time)*frequency*v_m_per_s}米，"
       f"平均前进速度为{((walk_time-back_time)*frequency*v_m_per_s)/((walk_time+back_time)*frequency)}米/秒")
-
 ```
 
 
@@ -744,6 +743,8 @@ robot_battery_level = 25  # 电池电量百分比
 
 if robot_battery_level < 20:
     print("⚠️ 电量不足，请及时充电！")
+elif condition:
+    do sth
 else:
     print("✅ 电量充足，可以继续运行")
 
@@ -934,6 +935,14 @@ robot.charge(30)
 chmod +x /home/pi/TonyPi/HiwonderSDK
 ```
 
+```shell
+pip install .
+```
+
+
+
+
+
 安装完成：
 
 ```shell
@@ -1116,7 +1125,7 @@ def run_robot_action(action_name):
         print(f"接收到指令，执行动作: {action_name}")
         # 直接调用您SDK中的函数
         # 注意：这里的路径需要是机器人的实际路径，如果SDK默认值正确则无需修改
-        AGC.runAction(action_name)
+        # AGC.runAction(action_name)
         return jsonify({"status": "success", "action": action_name})
     except Exception as e:
         print(f"执行动作失败: {e}")
@@ -1132,12 +1141,12 @@ if __name__ == '__main__':
 启动app：
 
 ```shell
-gunicorn --workers 4 --timeout 600 --bind 0.0.0.0:5000 app:app
+gunicorn --workers 1  --thread 4 --timeout 600 --bind 0.0.0.0:5000 app:app
 ```
 
 
 
-+ --workers 2: 指定了2个工作进程来处理请求，提高了并发能力。对于树莓派5，2到4个工作进程是合理的。
++ --workers 1: 指定了2个工作进程来处理请求，提高了并发能力。对于树莓派5，2到4个工作进程是合理的。
 + --timeout 600：设置超时时间，600s。
 + --bind 0.0.0.0:5000: 和 app.run() 中的 host 和 port 作用一样，监听所有网络接口的5000端口。
 + app:app: 第一个 app 指的是python文件名 `app.py`，第二个 app 指的是在该文件中创建的 Flask 实例 `app = Flask(__name__)`。
