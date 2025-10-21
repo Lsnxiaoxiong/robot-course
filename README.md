@@ -1429,6 +1429,8 @@ if __name__ == "__main__":
 
 ### 实现可重复启停的机器人控制器
 
+![robot_action.drawio](C:/Users/lsn/Desktop/res/robot_action.drawio.png)
+
 #### `robot_action.py`
 
 src/w02/robot_action.py
