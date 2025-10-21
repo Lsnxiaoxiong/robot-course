@@ -57,7 +57,6 @@ class Action:
             return RobotRespCodeEnum.ACTION_IS_STOPPED
         if self._thread is not None and self._thread.is_alive():
             return RobotRespCodeEnum.ACTION_IS_RUNNING
-
         return True
 
     def start(self) -> None:
