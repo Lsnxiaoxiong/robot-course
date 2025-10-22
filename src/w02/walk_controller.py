@@ -9,7 +9,7 @@ class WalkController(Action):
         super().__init__(name=name)
         self.name = name
 
-    def proxy_method(self) -> None:
+    def run_action(self) -> None:
         while not self.is_stopped():
             self.check_pause()
             AGC.runActionGroup('go_forward_one_step')

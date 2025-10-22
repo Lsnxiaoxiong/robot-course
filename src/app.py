@@ -74,34 +74,8 @@ app = create_app()
 #         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-# @app.route('/turn_head', methods=['POST'])
-# def turn_head():
-#     req_data = request.get_json()
-#     servo_id = req_data.get('servo_id')
-#     pulse = req_data.get('pulse')
-#     # ctl.set_pwm_servo_pulse(servo_id, pulse, 500)
-#     threading.Thread(target=ctl.set_pwm_servo_pulse, args=(servo_id, pulse, 500)).start()
-#     return jsonify({"status": "success", "servo_id": servo_id, "pulse": pulse})
 
-# @app.route('/startWalk', methods=['GET'])
-# def start_walk():
-#     app.walk_controller.start()
-#     return jsonify({"status": "success", "message": "行走已启动"})
 
-# @app.route('/pauseWalk', methods=['GET'])
-# def pause_walk():
-#     app.walk_controller.pause()
-#     return jsonify({"status": "success", "message": "行走已暂停"})
-
-# @app.route('/resumeWalk', methods=['GET'])
-# def resume_walk():
-#     app.walk_controller.resume()
-#     return jsonify({"status": "success", "message": "行走已恢复"})
-
-# @app.route('/stopWalk', methods=['GET'])
-# def stop_walk():
-#     app.walk_controller.stop()
-#     return jsonify({"status": "success", "message": "行走已停止"})
 
 if __name__ == '__main__':
     app = create_app()

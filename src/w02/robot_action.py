@@ -65,10 +65,11 @@ class Action:
         with self._lock:
             if not self.can_start():
                 return
+            self._stop_event.clear()
             self._status = ActionEnum.RUNNING
             self._run_event.set()
             try:
-                self._thread = threading.Thread(target=self.proxy_method, name=f"{self.name}-thread")
+                self._thread = threading.Thread(target=self.run_action, name=f"{self.name}-thread")
                 self._thread.start()
             except:
                 self._status = ActionEnum.FAILED
@@ -99,7 +100,7 @@ class Action:
             self._thread.join()
         self._thread = None
 
-    def proxy_method(self) -> None:
+    def run_action(self) -> None:
         """
         eg:
         while not self.is_stopped():
@@ -109,4 +110,4 @@ class Action:
                 time.sleep(1)
         :return: None
         """
-        raise NotImplementedError("Please implement the proxy_method in subclass")
+        raise NotImplementedError("Please implement the run_action in subclass")

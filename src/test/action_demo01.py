@@ -7,7 +7,7 @@ class ActionDemo(Action):
     def __init__(self, name="action_demo"):
         super().__init__(name=name)
 
-    def proxy_method(self):
+    def run_action(self):
         while not self.is_stopped():
             self.check_pause()
             print("hello")
