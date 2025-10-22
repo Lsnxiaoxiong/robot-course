@@ -1031,8 +1031,6 @@ AGC.stopActionGroup()  # 前进3秒后停止
 
 ```python
 import hiwonder.ActionGroupControl as AGC
-
-
 AGC.runActionGroup('back_one_step')
 ```
 
@@ -1042,8 +1040,6 @@ AGC.runActionGroup('back_one_step')
 
 ```python
 import hiwonder.ActionGroupControl as AGC
-
-
 AGC.runActionGroup('left_move')
 ```
 
@@ -1053,8 +1049,6 @@ AGC.runActionGroup('left_move')
 
 ```python
 import hiwonder.ActionGroupControl as AGC
-
-
 AGC.runActionGroup('right_move')
 ```
 
@@ -1117,14 +1111,11 @@ import hiwonder.ActionGroupControl as AGC
 # 初始化Flask应用
 app = Flask(__name__)
 
-# 创建一个API端点来执行动作
-# 可以通过访问 http://<树莓派IP>:5000/run_action/stand 来让机器人站立
+# 创建一个API端点来执行动作 
 @app.route('/run_action/<string:action_name>', methods=['GET'])
 def run_robot_action(action_name):
     try:
-        print(f"接收到指令，执行动作: {action_name}")
-        # 直接调用您SDK中的函数
-        # 注意：这里的路径需要是机器人的实际路径，如果SDK默认值正确则无需修改
+        print(f"接收到指令，执行动作: {action_name}") 
         # AGC.runAction(action_name)
         return jsonify({"status": "success", "action": action_name})
     except Exception as e:
@@ -1169,7 +1160,7 @@ gunicorn --workers 1  --thread 4 --timeout 600 --bind 0.0.0.0:5000 app:app
 打开浏览器输入：
 
 ```shell
-http:机器人ip:5000/
+http:机器人ip:5000/run_action/test
 ```
 
 正常返回json数据，说明启动正常。
