@@ -2,9 +2,7 @@ import time
 import threading
 from enum import Enum
 from typing import Optional
-import logging
 
-from src.w02.robot_manager import RobotRespCodeEnum
 
 
 # 定义动作状态
@@ -48,15 +46,13 @@ class Action:
     def is_stopped(self) -> bool:
         return self._stop_event.is_set()
 
-    def can_start(self) -> RobotRespCodeEnum:
+    def can_start(self) -> bool:
         if self.is_running():
-            return RobotRespCodeEnum.ACTION_ALREADY_RUNNING
+            return False
         if self.is_paused():
-            return RobotRespCodeEnum.ACTION_IS_PAUSED
-        if self.is_stopped():
-            return RobotRespCodeEnum.ACTION_IS_STOPPED
+            return False
         if self._thread is not None and self._thread.is_alive():
-            return RobotRespCodeEnum.ACTION_IS_RUNNING
+            return False
         return True
 
     def start(self) -> None:

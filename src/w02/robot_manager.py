@@ -10,7 +10,9 @@ from src.test.action_demo01 import ActionDemo
 from src.utils.annotation import enforce_types
 from src.utils.resp import Result
 from src.utils.robot_enum import ActionGroup, RobotRespCode
+from src.w02.custom_controller import CustomController
 from src.w02.robot_action import Action, ActionEnum
+from src.w02.s05_flow_control import actions
 from src.w02.walk_controller import WalkController
 
 # from src.w02.walk_controller import WalkController
@@ -20,14 +22,24 @@ logger = logging.getLogger(__name__)
 
 
 class RobotManager:
+    """
+    机器人动作管理器
+    """
     def __init__(self) -> None:
         self.action_dict: dict[ActionGroup, Action] = {
-            ActionGroup.WALK_FORWARD: WalkController(),
+            # ActionGroup.WALK_FORWARD: WalkController(),
             # ActionGroup.DEMO: ActionDemo(),
+        action: CustomController(action.action_name)
+        for action in ActionGroup
         }
 
     @enforce_types
     def start_action(self, action_name: str) -> Response:
+        """
+        启动机器人动作
+        :param action_name: 动作名称。从ActionGroup枚举类中选择。
+        :return: Response对象，包含操作结果。
+        """
         if action_name not in ActionGroup.__members__:
             return Result.failed(RobotRespCode.ACTION_NOT_FOUND)
         action: Action = self.action_dict[ActionGroup[action_name]]
@@ -64,14 +76,4 @@ class RobotManager:
         return Result.success(ActionGroup[action_name])
 
 
-if __name__ == '__main__':
-    rm = RobotManager()
-    rm.start_action(ActionGroup.DEMO)
-    # print(rm.action_dict)
-    time.sleep(5)
 
-    rm.pause_action(ActionGroup.DEMO)
-    time.sleep(5)
-    rm.resume_action(ActionGroup.DEMO)
-    time.sleep(5)
-    rm.stop_action(ActionGroup.DEMO)
