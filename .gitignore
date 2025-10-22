@@ -4,3 +4,4 @@
 
 model/*
 *.pth
+*.log
