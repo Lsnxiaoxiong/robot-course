@@ -55,13 +55,22 @@ def stop_action() -> Response:
     return resp
 
 @robot_bp.route('/turn_head', methods=['POST'])
-def turn_head():
+def turn_head() -> Response:
+    """
+    控制舵机转动到指定位置
+         servo_id: 要驱动的舵机id(the servo id needed to be driven)
+         pulse: 舵机目标位置(servo target position)
+            上下转动的舵机限制角度在130°左右，左右180°，范围在500-2500之间。
+         use_time: 转动需要的时间(the time needed to rotate)
+    eg:
+        ctl.set_pwm_servo_pulse(servo_id=1, pulse=1700, use_time=500) # 上下转头
+        ctl.set_pwm_servo_pulse(servo_id=2, pulse=1400, use_time=500) # 左右转头
+    :return: 返回JSON响应，包含操作状态和参数
+    """
     req_data = request.get_json()
     servo_id = req_data.get('servo_id')
     pulse = req_data.get('pulse')
-    # ctl.set_pwm_servo_pulse(servo_id, pulse, 500)
     threading.Thread(target=ctl.set_pwm_servo_pulse, args=(servo_id, pulse, 500)).start()
-    # return jsonify({"status": "success", "servo_id": servo_id, "pulse": pulse})
     return Result.success(data={
         "servo_id": servo_id,
         "pulse": pulse

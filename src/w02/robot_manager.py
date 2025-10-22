@@ -19,7 +19,6 @@ from src.w02.walk_controller import WalkController
 logger = logging.getLogger(__name__)
 
 
-
 class RobotManager:
     def __init__(self) -> None:
         self.action_dict: dict[ActionGroup, Action] = {
