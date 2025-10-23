@@ -19,6 +19,12 @@ ctl = Controller(board)
 
 @robot_bp.route('/action/start', methods=['POST'])
 def start_action() -> Response:
+    """
+    启动机器人动作
+     请求体参数:
+        action_name: 动作名称。从ActionGroup枚举类中选择。
+    :return: 响应结果
+    """
     robot_manager: RobotManager = current_app.robot_manager
     kwargs = request.get_json()
     action_name = kwargs.get('action_name', 'undefined')
@@ -28,6 +34,12 @@ def start_action() -> Response:
 
 @robot_bp.route('/action/pause', methods=['POST'])
 def pause_action() -> Response:
+    """
+    暂停机器人动作
+      请求体参数:
+        action_name: 动作名称。从ActionGroup枚举类中选择。
+    :return: 响应结果
+    """
     robot_manager: RobotManager = current_app.robot_manager
     kwargs = request.get_json()
     action_name = kwargs.get('action_name', 'undefined')
@@ -38,6 +50,12 @@ def pause_action() -> Response:
 
 @robot_bp.route('/action/resume', methods=['POST'])
 def resume_action() -> Response:
+    """
+    恢复机器人动作
+      请求体参数:
+        action_name: 动作名称。从ActionGroup枚举类中选择。
+    :return: 响应结果
+    """
     robot_manager: RobotManager = current_app.robot_manager
     kwargs = request.get_json()
     action_name = kwargs.get('action_name', 'undefined')
@@ -48,6 +66,12 @@ def resume_action() -> Response:
 
 @robot_bp.route('/action/stop', methods=['POST'])
 def stop_action() -> Response:
+    """
+    停止机器人动作
+      请求体参数:
+        action_name: 动作名称。
+    :return: 响应结果
+    """
     robot_manager: RobotManager = current_app.robot_manager
     kwargs = request.get_json()
     action_name = kwargs.get('action_name', 'undefined')
@@ -83,6 +107,8 @@ def turn_head() -> Response:
 def run_once() -> Response:
     """
     执行一次动作组
+      请求体参数:
+        action_name: 动作名称。从ActionGroup枚举类中选择。
     :return: 响应结果
     """
     action_name = request.view_args.get('action_name')
@@ -96,4 +122,8 @@ def run_once() -> Response:
 
 @robot_bp.route('/robotTest', methods=['GET'])
 def robot_test() -> Response:
+    """
+    测试接口
+    :return: 响应结果
+    """
     return Result.success("Robot is operational")

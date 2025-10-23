@@ -927,7 +927,7 @@ robot.charge(30)
 
 ### 创建虚拟环境
 
-使用conda创建虚拟环境，激活。进入`/home/pi/TonyPi/HiwonderSDK`路径。
+使用conda创建虚拟环境，激活。必须创建虚拟环境，直接在全局python环境安装会报错。进入`/home/pi/TonyPi/HiwonderSDK`路径。
 
 赋予执行权限：
 
@@ -935,11 +935,10 @@ robot.charge(30)
 chmod +x /home/pi/TonyPi/HiwonderSDK
 ```
 
+安装HiwonderSDK：
 ```shell
 pip install .
 ```
-
-
 
 
 
@@ -1025,8 +1024,6 @@ AGC.stopActionGroup()  # 前进3秒后停止
 
 
 
-
-
 **向后走**
 
 ```python
@@ -1051,10 +1048,6 @@ AGC.runActionGroup('left_move')
 import hiwonder.ActionGroupControl as AGC
 AGC.runActionGroup('right_move')
 ```
-
-
-
-
 
 
 
@@ -1794,6 +1787,7 @@ if __name__ == '__main__':
 
 + file：文件名称，支持各种格式如：`.txt`、`.json`
 + mode：打开文件模式，常用有：`w`覆盖写、`r`只读、`a`追加写。
++ encoding：编码方式，一般设置为utf-8。
 
 
 
@@ -1894,7 +1888,7 @@ where python
 
 ### 编辑launch.json文件
 
-打开一个.py文件，点击右上角“运行”图标，会弹出配置项，点击设置后，会打开launch.json文件。也可以直接在`.vscode/launch.json`直接打开。
+启动vscode，连接到机器人。打开一个.py文件，点击右上角“运行”图标，会弹出配置项，点击设置后，会打开launch.json文件。也可以直接在`.vscode/launch.json`直接打开。
 
 ![image-20251022142335538](README_assets/image-20251022142335538.png)
 
@@ -1952,8 +1946,9 @@ where python
   + 字典：字典推导式、合并字典、解包等
   + 元组：切片、解包、嵌套元组等
 
-+ 以面向对象的思想，加上机器人的基本控制，设计一个简单的机器人功能模块
-+ 提出三个任何与本节内容相关的问题，并自行回答
++ 运行本节课程代码。
++ 提出三个任何与本节内容相关的问题，并自行回答。
++ 将代码和问题回答推送到github。
 
 
 
@@ -2297,7 +2292,7 @@ mask1 = cv2.inRange(hsv, lower_red, upper_red)
 
 
 
-#### 练习
+#### 案例
 
 ##### 灰度化（BGR → Gray）
 
@@ -2932,7 +2927,7 @@ cv2.destroyAllWindows()
 
 ### 示例
 
-参考之前练习：[提取颜色示例](#提取图像中红色部分)。
+参考之前案例：[提取颜色示例](#提取图像中红色部分)。
 
 
 
