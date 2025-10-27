@@ -927,7 +927,7 @@ robot.charge(30)
 
 ### 创建虚拟环境
 
-使用conda创建虚拟环境，激活。必须创建虚拟环境，直接在全局python环境安装会报错。进入`/home/pi/TonyPi/HiwonderSDK`路径。
+使用conda创建虚拟环境，激活。必须创建虚拟环境，且虚拟环境**名称不能为hiwonder**，直接在全局python环境安装会报错。进入`/home/pi/TonyPi/HiwonderSDK`路径。
 
 赋予执行权限：
 
@@ -2280,15 +2280,11 @@ mask1 = cv2.inRange(hsv, lower_red, upper_red)
 
 #### Lab
 
-感知均匀的颜色空间，常用于图像增强和风格转换。
+它由三个通道组成:
 
-
-
-#### RGB ↔ BGR
-
-主要用于兼容 matplotlib 和其他库。
-
-
+- **L (亮度)**: 范围 0-100,表示从黑到白
+- **A**: 范围 -128 到 +127,表示从绿色到红色
+- **B**: 范围 -128 到 +127,表示从蓝色到黄色
 
 
 
@@ -2814,13 +2810,13 @@ if circularity > 0.8:
 
 `cv2.moments()` 可以用来计算**轮廓的几何矩（moments）**，这些矩可以用来求取形心（质心）坐标。
 
-> **零阶矩（m00m00）**‌：表示轮廓面积。
+> **零阶矩（m00）**‌：表示轮廓面积。
 >
-> ‌**一阶矩（m10m10 和 m01m01）**‌：用于计算质心坐标，公式为$X_{c}=\frac{M_{10}}{M_{00}} $，$Y_{c}=\frac{M_{01}}{M_{00}} $。
+> ‌**一阶矩（m10 和 m01）**‌：用于计算质心坐标，公式为$X_{c}=\frac{M_{10}}{M_{00}} $，$Y_{c}=\frac{M_{01}}{M_{00}} $。
 >
-> ‌**二阶矩（m20m20、m02m02、m11m11）**‌：关联旋转半径、长轴、短轴等特征。 
+> ‌**二阶矩（m20、m02、m11）**‌：关联旋转半径、长轴、短轴等特征。 
 >
-> ‌**三阶矩（m30m30、m03m03、m21m21、m12m12）**‌：反映轮廓的扭曲程度或斜度。
+> ‌**三阶矩（m30、m03、m21、m12）**‌：反映轮廓的扭曲程度或斜度。
 
 ```python
 M = cv2.moments(contour)
@@ -2861,6 +2857,7 @@ contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPR
 # 4️⃣ 遍历每个轮廓并判断形状
 for contour in contours:
     # 计算近似多边形
+    # 计算周长，单位像素
     epsilon = 0.02 * cv2.arcLength(contour, True)
     approx = cv2.approxPolyDP(contour, epsilon, True)
 
@@ -3163,6 +3160,36 @@ cv2.destroyAllWindows()
 
 
 
+## 开合手掌安装
+
+![image-20251027103948591](README_assets/image-20251027103948591.png)
+
+![image-20251027104001052](README_assets/image-20251027104001052.png)
+
+
+
+![image-20251027104013221](README_assets/image-20251027104013221.png)
+
+![image-20251027104025934](README_assets/image-20251027104025934.png)
+
+![image-20251027104038798](README_assets/image-20251027104038798.png)
+
+![image-20251027104049059](README_assets/image-20251027104049059.png)
+
+![image-20251027104059823](README_assets/image-20251027104059823.png)
+
+
+
+### 拆下接线
+
+先将舵机螺丝拧下，然后将连接线缠绕螺丝刀一圈拔出即可。
+
+![IMG_20251023_145904](README_assets/IMG_20251023_145904.jpg)
+
+
+
+
+
 ## 练习
 
 + 使用本节内容设计一个与机器人视觉相关的功能模块
@@ -3337,7 +3364,7 @@ arecord -D hw:2,0 -f S16_LE -r 16000 -c 2 test.wav
 
 
 
-# 智能搬运与田径跨栏（第7周）
+# 田径跨栏（第7周）
 
 ## 智能巡线
 

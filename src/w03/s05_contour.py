@@ -8,7 +8,7 @@ gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 cv2.imshow("Gray", gray)
 
 # 2️⃣ 转为二值图像（阈值分割）
-_, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+_, thresh = cv2.threshold(gray, 130, 255, cv2.THRESH_BINARY)
 cv2.imshow("Threshold", thresh)
 
 # 3️⃣ 提取轮廓
@@ -17,7 +17,13 @@ contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPR
 # 4️⃣ 遍历每个轮廓并判断形状
 for contour in contours:
     # 计算近似多边形
+    perim_px = cv2.arcLength(contour, True)  # 周长（像素单位，欧氏长度）
+    # 仅用于判别形状的多边形顶点
     epsilon = 0.02 * cv2.arcLength(contour, True)
+
+    if perim_px > 1:
+        print("arcLength:", perim_px)
+    # 顶点数组
     approx = cv2.approxPolyDP(contour, epsilon, True)
 
     # 绘制轮廓
@@ -45,7 +51,7 @@ for contour in contours:
         shape = "Circle"
 
     # 绘制文字
-    cv2.putText(img, shape, (cx - 40, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+    cv2.putText(img, shape , (cx - 40, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
 
 # 5️⃣ 显示结果
 cv2.imshow("Detected Shapes", img)

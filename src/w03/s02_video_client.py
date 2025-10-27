@@ -4,7 +4,7 @@ import struct
 import numpy as np
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(("192.168.149.1", 8888))  # 例如 ("127.0.0.1", 8888)
+client_socket.connect(("192.168.1.103", 8888))  # 例如 ("127.0.0.1", 8888)
 
 while True:
     # 先接收 4 字节长度
