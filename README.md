@@ -1966,6 +1966,8 @@ where python
 
 ###  OpenCV 的主要功能
 
+![opencv_module.drawio](README_assets/opencv_module.drawio.png)
+
 1. **图像处理**
    - 图像读写（`cv2.imread`, `cv2.imwrite`）
    - 图像缩放、旋转、裁剪、翻转
@@ -1987,11 +1989,7 @@ where python
 5. **几何与形状处理**
    - 轮廓检测（`cv2.findContours`）
    - 直线检测（霍夫变换）
-   - 图形绘制（直线、圆、矩形、文字等）
-6. **机器视觉应用**
-   - 运动跟踪
-   - 目标分割
-   - 增强现实（AR）应用
+   - 图形绘制（直线、圆、矩形、文字等） 
 
 
 
@@ -2689,7 +2687,7 @@ _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
 | 灰度图          | 二值图      |
 | --------------- | ----------- |
-| 122 134 180 220 | 0 0 255 255 |
+| 112 104 180 220 | 0 0 255 255 |
 
 只有白色区域才被认为是“要检测的对象”。
 
@@ -2922,12 +2920,6 @@ cv2.destroyAllWindows()
 
 
 
-### 示例
-
-参考之前案例：[提取颜色示例](#提取图像中红色部分)。
-
-
-
 ### 常用颜色HSV区间
 
 | 颜色 | H 范围             | S/V                 |
@@ -2940,6 +2932,12 @@ cv2.destroyAllWindows()
 |紫色|	[125, 155]	|S: 100-255, V: 100-255|
 
 
+
+### 颜色追踪
+
+#### 基本流程
+
+![color_track.drawio](README_assets/color_track.drawio.png)
 
 ## 人脸检测
 

@@ -13,8 +13,6 @@ class ColorTracker:
 
         self.cx = 240
         self.cy = 320
-        self.temp_x = 0
-        self.temp_y = 0
         self.lower_color = np.array([36, 35, 35])
         self.upper_color = np.array([86, 255, 255])
         self.is_tracking = False
