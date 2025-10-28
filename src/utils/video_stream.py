@@ -4,7 +4,6 @@ import struct
 import cv2
 import numpy as np
 
-
 def get_frame(ip: str="192.168.1.103", port: int=8888):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((ip, port))
@@ -36,8 +35,8 @@ def get_frame(ip: str="192.168.1.103", port: int=8888):
         cv2.destroyAllWindows()
 
 
-if __name__ == "__main__":
-    for frame in get_frame():
-        cv2.imshow("Client", frame)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
+# if __name__ == "__main__":
+#     for frame in get_frame():
+#         cv2.imshow("Client", frame)
+#         if cv2.waitKey(1) & 0xFF == ord("q"):
+#             break

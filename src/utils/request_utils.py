@@ -4,7 +4,7 @@ import requests
 
 class RobotTool:
 
-    base_url = "http://192.168.1.103:5000"
+    base_url = "http://192.168.137.248:5000"
 
     servo1 = 1600 #上下
     servo2 = 1400 #左右

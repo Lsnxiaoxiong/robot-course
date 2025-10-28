@@ -10,7 +10,7 @@ from src.utils.video_stream import get_frame
 
 class ColorTracker:
     def __init__(self):
-
+# 480 640
         self.cx = 240
         self.cy = 320
         self.lower_color = np.array([36, 35, 35])
@@ -83,7 +83,7 @@ class ColorTracker:
     def start(self):
         # threading.Thread(target=self.turn_head).start()
         RobotTool.init_head()
-        for frame in get_frame(ip="192.168.1.103", port=8888):
+        for frame in get_frame(ip="192.168.137.248", port=8888):
             # frame = cv2.flip(frame, 1)
             cv2.imshow("Camera", frame)
             # print(frame.shape)  480, 640
