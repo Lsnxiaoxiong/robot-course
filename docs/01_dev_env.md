@@ -1111,7 +1111,7 @@ print("Conv2D output shape:", y.shape)
 
 ### VNC-Viewer
 
-选择合适版本VNC-Viewer安装
+[官网](https://vnc-viewer-2.updatestar.com/download)选择合适版本VNC-Viewer安装
 
 ![image-20250916114105939](01_dev_env_assets/image-20250916114105939.png)
 
