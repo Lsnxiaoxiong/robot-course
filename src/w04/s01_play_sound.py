@@ -1,4 +1,7 @@
-from playsound import playsound
+import sounddevice as sd
+import soundfile as sf
 
-# 播放音频文件（支持 mp3 / wav）
-playsound("skk.wav")
+# 读取并播放
+data, rate = sf.read('skk.wav')
+sd.play(data, rate)
+sd.wait()  # 等待播放完成

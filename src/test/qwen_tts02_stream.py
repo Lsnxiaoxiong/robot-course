@@ -31,7 +31,7 @@ stream = p.open(format=pyaudio.paInt16,
 
 text = "你好啊，我是通义千问"
 response = dashscope.MultiModalConversation.call(
-    api_key="sk-c1d6b7977b294147a2dab8a81d5bf735",
+    api_key="sk-eebe8334fc4f4c8f82294c16d3f767cf",
     model="qwen3-tts-flash",
     text=text,
     voice="Cherry",

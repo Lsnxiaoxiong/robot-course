@@ -74,8 +74,6 @@
 
 ## 引言
 
-同学们好，欢迎选修《人形机器人技术导论》这门课程。
-
 如果说计算机、智能手机和新能源汽车定义了过去的数十年，那么人形机器人，这一集人工智能、高端制造、新材料等前沿技术于一体的结晶，正蓄势待发，成为开启未来的关键。本课程将作为你们的向导，共同探索这个令人兴奋的新兴领域。
 
 
@@ -3249,7 +3247,7 @@ cv2.destroyAllWindows()
 
 使用 M4*6 的圆头螺丝将 AI 语音交互盒（WonderEcho Pro）安装在 TonyPi 的背部，注意安装方向。
 
-![image-20251008153222819](README_assets/image-20251008153222819.png)
+​	![image-20251008153222819](README_assets/image-20251008153222819.png)
 
 
 
@@ -3296,23 +3294,351 @@ arecord -D hw:2,0 -f S16_LE -r 16000 -c 2 test.wav
 
 
 
+## 数字音频
+
+声音主要有响度、音高、音高三个基本要素，采样到后以波形图显示。在波形图中，波幅越大，声音的响度越大；波峰间距越小，声音的频率越高；声音的主要特征（音色）不是依赖单一频率，而是由一系列**谐波频率**共同构成。
+
+ |听觉属性 |	物理基础	 |数据层面如何体现 |
+  |---- |---- |---- |
+ |响度 (Loudness) |	振幅（amplitude）	 |采样值的幅度大小（例如 RMS 或能量） |
+ |音高 (Pitch) |	波形周期（frequency）	 |采样信号的周期性（波峰间距） |
+ |音色 (Timbre) |	谐波结构（harmonic content）	 |波形的频谱分布（各频率的能量组合） |
+
+![image-20251031151434420](README_assets/image-20251031151434420.png)
 
 
-## 语音控制TonyPi
+
+![image-20251031151458884](README_assets/image-20251031151458884.png)
+
+对波形图做傅里叶变换，可以得到频谱图。
+
+| 视觉部分             | 声音中代表的内容 | 听感                       |
+| -------------------- | ---------------- | -------------------------- |
+| 底部横纹（低频部分） | 声音的**基频**   | 决定**音高**（pitch）      |
+| 上方多层横纹         | **谐波成分**     | 决定**音色**（timbre）     |
+| 竖直亮带             | **瞬时能量变化** | 表示爆破音、鼓击、辅音爆发 |
+| 模糊区域             | **气息声/噪声**  | 决定**粗糙感**或**呼吸感** |
+
+![image-20251031162402410](README_assets/image-20251031162402410.png)
+
+
+
+### 采样参数
+
+| 参数名               | 英文                             | 含义                             | 举例                                   | 影响                              |
+| -------------------- | -------------------------------- | -------------------------------- | -------------------------------------- | --------------------------------- |
+| **采样率**           | Sample Rate / Sampling Frequency | 每秒采样点数（Hz）               | 44100 Hz（CD标准）16000 Hz（语音常用） | 决定最高可还原频率（=采样率 / 2） |
+| **量化位深（位宽）** | Bit Depth / Sample Width         | 每个采样点用多少位二进制表示振幅 | 8-bit、16-bit、24-bit、32-bit float    | 位深越高 → 动态范围更大、噪声更小 |
+| **通道数**           | Channels                         | 声道数（单声道、立体声、多声道） | 1（Mono）、2（Stereo）                 | 决定空间感与声场                  |
+| **采样格式**         | Sample Format                    | 数据在内存或文件中的存储类型     | int16、float32、PCM、ALAW 等           | 不同格式精度与兼容性不同          |
+| **时长**             | Duration                         | 音频持续的总时间（秒）           | 3.5s、10s                              | 影响文件大小                      |
+| **采样点数**         | Sample Count                     | 总采样点数 = 采样率 × 时长       | 44100 × 3 = 132300                     | 与采样率和时长直接相关            |
+| **比特率**           | Bitrate                          | 每秒数据量（bps）                | 128 kbps、320 kbps（MP3）              | 决定压缩音质                      |
+| **声道布局**         | Channel Layout                   | 声道的空间分布方式               | L/R、5.1、7.1 等                       | 多声道影院音频常见                |
+
+
+
+## 阿里云语音API
+
+[官网](https://bailian.console.aliyun.com/?tab=model#/model-market)
+
+![image-20251103222708566](README_assets/image-20251103222708566.png)
+
+
+
+### 创建APIKEY
+
+注册实名后，点击“密钥管理”——“创建API-KEY”，选择账号，确认即可。
+
+![image-20251103222850319](README_assets/image-20251103222850319.png)
+
+![image-20251103222923122](README_assets/image-20251103222923122.png)
+
+
+
+### 语音合成
+
+```python
+#  DashScope SDK 版本不低于 1.24.6
+# coding=utf-8
+#
+# Installation instructions for pyaudio:
+# APPLE Mac OS X
+#   brew install portaudio
+#   pip install pyaudio
+# Debian/Ubuntu
+#   sudo apt-get install python-pyaudio python3-pyaudio
+#   or
+#   pip install pyaudio
+# CentOS
+#   sudo yum install -y portaudio portaudio-devel && pip install pyaudio
+# Microsoft Windows
+#   python -m pip install pyaudio
+
+import os
+import dashscope
+import pyaudio
+import time
+import base64
+import numpy as np
+
+p = pyaudio.PyAudio()
+# 创建音频流
+stream = p.open(format=pyaudio.paInt16,
+                channels=1,
+                rate=24000,
+                output=True)
+
+
+text = "你好啊，我是通义千问"
+response = dashscope.MultiModalConversation.call(
+    api_key="sk-eebe8334fc4f4c8f82294c16d3f767cf",
+    model="qwen3-tts-flash",
+    text=text,
+    voice="Cherry",
+    language_type="Chinese",  # 建议与文本语种一致，以获得正确的发音和自然的语调。
+    stream=True
+)
+
+for chunk in response:
+    audio = chunk.output.audio
+    if audio.data is not None:
+        wav_bytes = base64.b64decode(audio.data)
+        audio_np = np.frombuffer(wav_bytes, dtype=np.int16)
+        # 直接播放音频数据
+        stream.write(audio_np.tobytes())
+    if chunk.output.finish_reason == "stop":
+        print("finish at: {} ", chunk.output.audio.expires_at)
+time.sleep(0.8)
+# 清理资源
+stream.stop_stream()
+stream.close()
+p.terminate()
+
+```
+
+
+
+### 语音识别
+
+```python
+import os
+import dashscope
+
+# 以下为北京地域url，若使用新加坡地域的模型，需将url替换为：https://dashscope-intl.aliyuncs.com/api/v1
+dashscope.base_http_api_url = 'https://dashscope.aliyuncs.com/api/v1'
+
+messages = [
+    {
+        "role": "system",
+        "content": [
+            # 此处用于配置定制化识别的Context
+            {"text": ""},
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {"audio": "D:\\source\\robot-course\\src\\w04\\skk.wav"},
+            # {"audio": "https://dashscope.oss-cn-beijing.aliyuncs.com/audios/welcome.mp3"},
+        ]
+    }
+]
+response = dashscope.MultiModalConversation.call(
+    # 新加坡和北京地域的API Key不同。获取API Key：https://help.aliyun.com/zh/model-studio/get-api-key
+    # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key = "sk-xxx"
+    # api_key=os.getenv("DASHSCOPE_API_KEY"),
+    api_key="sk-eebe8334fc4f4c8f82294c16d3f767cf",
+    model="qwen3-asr-flash",
+    messages=messages,
+    result_format="message",
+    asr_options={
+        # "language": "zh", # 可选，若已知音频的语种，可通过该参数指定待识别语种，以提升识别准确率
+        "enable_itn":True
+    }
+)
+print(response)
+```
 
 
 
 
-
-## 颜色识别与播报
-
-## 语音API
 
 ## 开源项目介绍
 
+
+
+### kokoro
+
+https://github.com/hexgrad/kokoro
+
+
+
+```python
+# 1️⃣ Install kokoro
+!pip install -q kokoro>=0.9.4 soundfile
+# 2️⃣ Install espeak, used for English OOD fallback and some non-English languages
+!apt-get -qq -y install espeak-ng > /dev/null 2>&1
+
+# 3️⃣ Initalize a pipeline
+from kokoro import KPipeline
+from IPython.display import display, Audio
+import soundfile as sf
+import torch
+# 🇺🇸 'a' => American English, 🇬🇧 'b' => British English
+# 🇪🇸 'e' => Spanish es
+# 🇫🇷 'f' => French fr-fr
+# 🇮🇳 'h' => Hindi hi
+# 🇮🇹 'i' => Italian it
+# 🇯🇵 'j' => Japanese: pip install misaki[ja]
+# 🇧🇷 'p' => Brazilian Portuguese pt-br
+# 🇨🇳 'z' => Mandarin Chinese: pip install misaki[zh]
+pipeline = KPipeline(lang_code='a') # <= make sure lang_code matches voice, reference above.
+
+# This text is for demonstration purposes only, unseen during training
+text = '''
+The sky above the port was the color of television, tuned to a dead channel.
+"It's not like I'm using," Case heard someone say, as he shouldered his way through the crowd around the door of the Chat. "It's like my body's developed this massive drug deficiency."
+It was a Sprawl voice and a Sprawl joke. The Chatsubo was a bar for professional expatriates; you could drink there for a week and never hear two words in Japanese.
+
+These were to have an enormous impact, not only because they were associated with Constantine, but also because, as in so many other areas, the decisions taken by Constantine (or in his name) were to have great significance for centuries to come. One of the main issues was the shape that Christian churches were to take, since there was not, apparently, a tradition of monumental church buildings when Constantine decided to help the Christian church build a series of truly spectacular structures. The main form that these churches took was that of the basilica, a multipurpose rectangular structure, based ultimately on the earlier Greek stoa, which could be found in most of the great cities of the empire. Christianity, unlike classical polytheism, needed a large interior space for the celebration of its religious services, and the basilica aptly filled that need. We naturally do not know the degree to which the emperor was involved in the design of new churches, but it is tempting to connect this with the secular basilica that Constantine completed in the Roman forum (the so-called Basilica of Maxentius) and the one he probably built in Trier, in connection with his residence in the city at a time when he was still caesar.
+
+[Kokoro](/kˈOkəɹO/) is an open-weight TTS model with 82 million parameters. Despite its lightweight architecture, it delivers comparable quality to larger models while being significantly faster and more cost-efficient. With Apache-licensed weights, [Kokoro](/kˈOkəɹO/) can be deployed anywhere from production environments to personal projects.
+'''
+# text = '「もしおれがただ偶然、そしてこうしようというつもりでなくここに立っているのなら、ちょっとばかり絶望するところだな」と、そんなことが彼の頭に思い浮かんだ。'
+# text = '中國人民不信邪也不怕邪，不惹事也不怕事，任何外國不要指望我們會拿自己的核心利益做交易，不要指望我們會吞下損害我國主權、安全、發展利益的苦果！'
+# text = 'Los partidos políticos tradicionales compiten con los populismos y los movimientos asamblearios.'
+# text = 'Le dromadaire resplendissant déambulait tranquillement dans les méandres en mastiquant de petites feuilles vernissées.'
+# text = 'ट्रांसपोर्टरों की हड़ताल लगातार पांचवें दिन जारी, दिसंबर से इलेक्ट्रॉनिक टोल कलेक्शनल सिस्टम'
+# text = "Allora cominciava l'insonnia, o un dormiveglia peggiore dell'insonnia, che talvolta assumeva i caratteri dell'incubo."
+# text = 'Elabora relatórios de acompanhamento cronológico para as diferentes unidades do Departamento que propõem contratos.'
+
+# 4️⃣ Generate, display, and save audio files in a loop.
+generator = pipeline(
+    text, voice='af_heart', # <= change voice here
+    speed=1, split_pattern=r'\n+'
+)
+# Alternatively, load voice tensor directly:
+# voice_tensor = torch.load('path/to/voice.pt', weights_only=True)
+# generator = pipeline(
+#     text, voice=voice_tensor,
+#     speed=1, split_pattern=r'\n+'
+# )
+
+for i, (gs, ps, audio) in enumerate(generator):
+    print(i)  # i => index
+    print(gs) # gs => graphemes/text
+    print(ps) # ps => phonemes
+    display(Audio(data=audio, rate=24000, autoplay=i==0))
+    sf.write(f'{i}.wav', audio, 24000) # save each audio file
+```
+
+
+
+
+
+
+
 ### Index-TTS(TTS)
 
-### sherpa-onnx(ASR)
+![image-20251029171522720](README_assets/image-20251029171522720.png)
+
+#### 简介
+
+[Index-tts](https://github.com/index-tts/index-tts)是B站开源的TTS（Text To Speech）项目。能够使用非常简短的语音音频进行音色克隆。截止2025.10.29，index-tts已有两个版本：
+
+| 特性                         | 版本   | 资源消耗   |
+| ---------------------------- | ------ | ---------- |
+| 零样本音色克隆，音色还原度高 | v1.5.0 | 4G显存可用 |
+| 增加情感控制                 | v2     | >4G显存    |
+
+
+
+#### 安装
+
+##### 下载源码
+
+选择v1.5.0版本，点击下载源码。
+
+![image-20251029174517351](README_assets/image-20251029174517351.png)
+
+![image-20251029174610273](README_assets/image-20251029174610273.png)
+
+##### 创建虚拟环境
+
+创建一个名为it15，安装ffpege，python版本为3.10：
+
+```shell
+conda create -n it15 -c conda-forge python=3.10 ffmpeg --no-channel-priority
+```
+
+
+
+安装pytorch：
+
+```shell
+pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
+
+
+如果是windows系统，需要额外安装：
+
+```python
+conda install -c conda-forge pynini==2.1.6
+pip install WeTextProcessing --no-deps
+```
+
+
+
+**安装**
+
+进入到项目目录，运行：
+
+```shell
+pip install -e .
+```
+
+
+
+#### 下载模型
+
+```shell
+huggingface-cli download IndexTeam/IndexTTS-1.5 config.yaml bigvgan_discriminator.pth bigvgan_generator.pth bpe.model dvae.pth gpt.pth unigram_12000.vocab --local-dir checkpoints
+```
+
+
+
+如果下载慢，可以使用镜像：
+
+```shell
+export HF_ENDPOINT="https://hf-mirror.com"
+set HF_ENDPOINT=https://hf-mirror.com
+```
+
+
+
+#### 运行
+
+```python
+from indextts.infer import IndexTTS
+
+tts = IndexTTS(model_dir="checkpoints",cfg_path="checkpoints/config.yaml")
+voice = "example/skk.wav"
+text = "大家好，我现在正在bilibili 体验 ai 科技，说实话，来之前我绝对想不到！AI技术已经发展到这样匪夷所思的地步了！比如说，现在正在说话的其实是B站为我现场复刻的数字分身，简直就是平行宇宙的另一个我了。如果大家也想体验更多深入的AIGC功能，可以访问 bilibili studio，相信我，你们也会吃惊的。"
+# tts.infer_fast(voice, text, 'example/text01.wav')
+tts.infer(voice, text, 'example/gen2.wav')
+```
+
+
+
+
+
+
+
+
+
+
 
 ## 练习
 

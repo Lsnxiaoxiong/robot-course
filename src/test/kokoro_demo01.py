@@ -24,12 +24,13 @@ class AudioGenerator:
 
     def generate_audio(self):
         while not self._stop_event.is_set():
+            # 如果文本队列为空，则等待
             if self.text_queue.empty():
                 self._generate_pause_event.clear()
             self._generate_pause_event.wait()
 
             text = self.text_queue.get()
-            print(f">>>开始生成文本：{text}")
+            print(f">>>开始生成音频：{text}")
             generator = self.pipeline(
                 text, voice='zf_xiaoxiao', model=self.kmodel,
                 speed=0.95, split_pattern=r'[。！？,\.\!\?、\n]+'
@@ -48,6 +49,7 @@ class AudioGenerator:
         )
         stream.start()
         while not self._stop_event.is_set():
+            # 如果音频队列为空，则等待
             if self.audio_queue.empty():
                 self._play_pause_event.clear()
             self._play_pause_event.wait()
@@ -57,8 +59,6 @@ class AudioGenerator:
             # print(f"▶ 正在播放第 {i} 段...")
             # 直接写入流，不会阻塞
             stream.write(audio)
-            # sd.play(audio, rate)
-            # sd.wait()
             # sf.write(f'{i}.wav', audio, rate)
             self.audio_queue.task_done()
 

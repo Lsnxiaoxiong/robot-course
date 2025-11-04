@@ -126,7 +126,6 @@ class SpeechRecognizer:
         self._stop_event.set()
         self._pause_event.set()
         self.stream.stop()
-        # 最后一块 flush（告诉模型结束）
         res = self.model.generate(
             input=np.array([], dtype=np.int16),
             cache=self.cache,

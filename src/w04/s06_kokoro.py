@@ -96,3 +96,8 @@ class AudioGenerator:
 if __name__ == '__main__':
     audio_generator = AudioGenerator()
     audio_generator.start_with_text()
+
+    """
+    你对于某个问题没有调查，就停止你对于某个问题的发言权。这不太野蛮了吗？一点也不野蛮。你对那个问题的现实情况和历史情况既然没有调查，不知底里，对于那个问题的发言便一定是瞎说一顿。
+
+    """

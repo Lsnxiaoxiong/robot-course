@@ -24,7 +24,7 @@ response = dashscope.MultiModalConversation.call(
     # 新加坡和北京地域的API Key不同。获取API Key：https://help.aliyun.com/zh/model-studio/get-api-key
     # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key = "sk-xxx"
     # api_key=os.getenv("DASHSCOPE_API_KEY"),
-    api_key="sk-eebe8334fc4f4c8f82294c16d3f767cf",
+    api_key="sk-e172d890e06248d2b84674523749652a",
     model="qwen3-asr-flash",
     messages=messages,
     result_format="message",
