@@ -113,6 +113,9 @@ class SpeechRecognizer:
             speech_chunk = np.frombuffer(data, dtype=np.int16)
             self.recognize(speech_chunk)
 
+    def start_reco_with_audio(self, audio_chunk: np.ndarray):
+        self.recognize(audio_chunk)
+
     def async_run(self):
         threading.Thread(target=self.start_recognition, daemon=True).start()
 

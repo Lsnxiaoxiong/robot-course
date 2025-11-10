@@ -62,6 +62,17 @@ class AudioGenerator:
             # sf.write(f'{i}.wav', audio, rate)
             self.audio_queue.task_done()
 
+    def get_audio(self):
+        while not self._stop_event.is_set():
+            # 如果音频队列为空，则等待
+            if self.audio_queue.empty():
+                self._play_pause_event.clear()
+            i, audio = self.audio_queue.get()
+            if audio is None:
+                break
+            yield audio
+
+
     def push_text(self, text):
         self.text_queue.put(text)
         self._generate_pause_event.set()
@@ -87,6 +98,9 @@ class AudioGenerator:
     def start(self):
         threading.Thread(target=self.generate_audio, daemon=True).start()
         threading.Thread(target=self.play_audio, daemon=True).start()
+
+    def start_generate(self):
+        threading.Thread(target=self.generate_audio, daemon=True).start()
 
     def start_with_text(self):
         self.start()

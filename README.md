@@ -3650,17 +3650,307 @@ tts.infer(voice, text, 'example/gen2.wav')
 
 # 机器人传感器（第5周）
 
+
+
+## 查看可用的GPIO控制器
+
+终端输入：
+
+```shell
+ls /dev/gpiochip*
+```
+
+![image-20251107104334389](README_assets/image-20251107104334389.png)
+
+
+
+## 安装依赖
+
+gpiozero 是一个高级库，它使用起来非常简单，并且在底层它会自动调用当前系统最合适的后端库（例如 lgpio），这些后端库是专门为新硬件和新操作系统设计的。
+
+```shell
+pip install gpiozero
+pip install lgpio
+```
+
+
+
+
+
+
+
 ## 风扇模块实验
+
+```python
+
+from gpiozero import OutputDevice
+from time import sleep
+
+# gpiozero 默认使用 BCM 编号，我们直接指定引脚号
+# gpiozero uses BCM numbering by default, we just specify the pin numbers
+fanPin1 = OutputDevice(8)
+fanPin2 = OutputDevice(7)
+
+# fan control
+def set_fan(start):
+    if start == 1:
+        ## 开启风扇, 顺时针(turn on the fan, clockwise)
+        print("Turning fan ON")
+        fanPin1.on()  # 等同于输出高电平 (Equivalent to outputting HIGH)
+        fanPin2.off() # 等同于输出低电平 (Equivalent to outputting LOW)
+    else:
+        ## 关闭风扇(turn off the fan)
+        print("Turning fan OFF")
+        fanPin1.off() # 等同于输出低电平 (Equivalent to outputting LOW)
+        fanPin2.off() # 等同于输出低电平 (Equivalent to outputting LOW)
+
+if __name__ == '__main__':
+    try:
+        # 初始状态，关闭风扇
+        set_fan(0)
+        sleep(1)
+        
+        # 开启风扇并保持运行
+        set_fan(1)
+        while True:
+            sleep(1)
+    except KeyboardInterrupt:
+        print("\nProgram interrupted. Turning fan off.")
+        # gpiozero 会在程序结束时自动清理资源，但手动关闭更保险
+        # gpiozero cleans up resources automatically on exit, but manual shutdown is safer
+        set_fan(0)
+```
+
+
+
+
 
 ## 触摸传感器实验
 
-## MP3模块实验
+```python
+
+import os
+import sys
+import time
+# 替换 gpiod 库为 gpiozero 库
+from gpiozero import Button 
+import hiwonder.ros_robot_controller_sdk as rrc
+
+
+board = rrc.Board()
+    
+st = 0 # 状态变量，用于防止反复响
+
+# 使用 Button 类初始化引脚 22。Button 默认启用内部上拉电阻，并处理为按下时为 True (低电平触发)。
+# 注意：假设这里的 22 对应于 BCM 编号 22。
+touch = Button(22)
+
+if __name__ == '__main__': 
+    try:
+        while True:
+            # 读取传感器状态。touch.is_pressed 在传感器被按下(低电平)时返回 True
+            state = touch.is_pressed   
+            
+            if state: # 如果传感器被按下 (对应原代码 if not state:)
+                if st:            # 这里做一个判断，防止反复响
+                    st = 0
+                    # 以1900Hz的频率，持续响0.1秒，关闭0.9秒，重复1次
+                    board.set_buzzer(1900, 0.1, 0.9, 1) 
+            else: # 如果传感器未被按下 (对应原代码 else:)
+                st = 1
+                # 关闭蜂鸣器
+                board.set_buzzer(1000, 0.0, 0.0, 1) 
+            
+            # 增加一个小的延时，避免 CPU 占用过高
+            time.sleep(0.1) 
+            
+    except KeyboardInterrupt:
+        # 捕获键盘中断 (Ctrl+C)
+        pass
+    finally:
+        # 无论如何，确保程序退出时关闭蜂鸣器
+        board.set_buzzer(1000, 0.0, 0.0, 1) # 关闭
+        print("Program terminated.")
+```
+
+
+
+## 温度传感器
+
+```python
+
+import time
+import smbus
+from hiwonder.display import TM1640
+from hiwonder.number_model import render_number
+
+
+class AHT10:
+    CONFIG = [0x08, 0x00]
+    MEASURE = [0x33, 0x00]
+
+    def __init__(self, bus=1, addr=0x38):
+        self.bus = smbus.SMBus(bus)
+        self.addr = addr
+        time.sleep(0.2) 
+
+    def getData(self):
+        byte = self.bus.read_byte(self.addr)
+        self.bus.write_i2c_block_data(self.addr, 0xAC, self.MEASURE)
+        time.sleep(0.5)
+        data = self.bus.read_i2c_block_data(self.addr, 0x00)
+        temp = ((data[3] & 0x0F) << 16) | (data[4] << 8) | data[5]
+        ctemp = ((temp*200) / 1048576) - 50
+        hum = ((data[1] << 16) | (data[2] << 8) | data[3]) >> 4
+        chum = int(hum * 100 / 1048576)
+        
+        return (ctemp, chum)
+
+
+if __name__ == '__main__':
+    aht10 = AHT10()
+    display = TM1640(dio=22, clk=24)
+    display.clear()
+    while True:
+        # 提取温度
+        tempture = str(round(aht10.getData()[0], 1))
+
+        # 提取出三个数字
+        num1, num2, num3 = tempture[0], tempture[1], tempture[3]
+
+        display.display_buf = render_number(num1, num2, ".", num3)
+        display.update_display()
+
+        time.sleep(2)
+
+        #提取湿度
+        humidity = str(round(aht10.getData()[1], 1))
+
+        # 提取出两个数字
+        num1, num2 = humidity[0], humidity[1]
+
+        display.display_buf = render_number(num1, num2, "%", "%")
+        
+        time.sleep(2)
+
+```
+
+
+
+
 
 ## 超声波传感器实验
 
-## 点阵模块实验
+```python
+import os
+import sys
+import time
+import hiwonder.Sonar as Sonar
+
+if sys.version_info.major == 2:
+    print('Please run this program with python3!')
+    sys.exit(0)
+
+
+
+s = Sonar.Sonar()
+s.setRGBMode(0)    #设置灯的模式，0为彩灯模式，1为呼吸灯模式(set the light mode, 0 is color light mode, 1 is breathing light mode)
+s.setRGB(1, (35,205,55))
+s.setRGB(0, (235,205,55))
+s.startSymphony()
+
+if __name__ == "__main__":
+    while True:
+        time.sleep(1)
+        if s.getDistance() != 99999:
+            print("Distance:", s.getDistance() , "mm")
+            distance = s.getDistance()
+            
+            if 0.0 <= distance <= 100.0:
+                s.setRGBMode(0)
+                s.setRGB(1, (255,0,0))  #两边RGB设置为红色(set both RGB to red)
+                s.setRGB(0, (255,0,0))
+                
+            if 100.0 < distance <= 150.0:
+                s.setRGBMode(0)
+                s.setRGB(1, (0,255,0))  #两边RGB设置为绿色(set both RGB to green)
+                s.setRGB(0, (0,255,0))
+                
+            if 150.0 < distance <= 200.0:
+                s.setRGBMode(0)
+                s.setRGB(1, (0,0,255))  #两边RGB设置为蓝色(set both RGB to blue)
+                s.setRGB(0, (0,0,255))
+                
+            if distance > 200.0:
+                s.setRGBMode(0)      
+                s.setRGB(1, (255,255,255)) # 两边RGB设置为白色(set both RGB to white)
+                s.setRGB(0, (255,255,255))
+
+```
+
+
+
+
 
 ## 光线传感器实验
+
+```python
+import os
+import sys
+import time
+# 替换 gpiod 库为 gpiozero 库
+from gpiozero import DigitalInputDevice
+import hiwonder.ros_robot_controller_sdk as rrc
+
+if sys.version_info.major == 2:
+    print('Please run this program with python3!')
+    sys.exit(0)
+
+
+board = rrc.Board()
+    
+st = 0 # 状态变量，用于防止反复响
+
+# 使用 DigitalInputDevice 初始化引脚 24。
+# 设置 pull_up=True 启用内部上拉电阻，与原代码的 gpiod.LINE_REQ_FLAG_BIAS_PULL_UP 作用一致。
+# 注意：假设这里的 24 对应于 BCM 编号 24。
+light = DigitalInputDevice(24, pull_up=True)
+
+if __name__ == "__main__":
+    try:
+        while True:
+            # 读取传感器状态。value 为 0 或 1。
+            # 大多数数字光线传感器模块在感应到光线变化时会输出低电平（0）。
+            state = light.value  
+            print(state)
+            
+            if not state: # 如果状态为低电平（0）
+                if st:            # 这里做一个判断，防止反复响
+                    st = 0
+                    # 以1900Hz的频率，持续响0.1秒，关闭0.9秒，重复1次
+                    board.set_buzzer(1900, 0.1, 0.9, 1) 
+                    time.sleep(1) # 增加的延时确保蜂鸣器响完
+                
+            else: # 如果状态为高电平（1）
+                st = 1
+                # 关闭蜂鸣器
+                board.set_buzzer(1000, 0.0, 0.0, 1) 
+            
+            # 增加一个小的延时，避免 CPU 占用过高
+            time.sleep(0.01)
+
+    except KeyboardInterrupt:
+        # 捕获键盘中断 (Ctrl+C)
+        pass
+    finally:
+        # 无论如何，确保程序退出时关闭蜂鸣器
+        board.set_buzzer(1000, 0.0, 0.0, 1) # 关闭
+        print("Program terminated.")
+```
+
+
+
+
 
 ## 练习
 
