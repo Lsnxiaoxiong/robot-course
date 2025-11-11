@@ -3735,10 +3735,7 @@ import time
 # 替换 gpiod 库为 gpiozero 库
 from gpiozero import Button 
 import hiwonder.ros_robot_controller_sdk as rrc
-
-
 board = rrc.Board()
-    
 st = 0 # 状态变量，用于防止反复响
 
 # 使用 Button 类初始化引脚 22。Button 默认启用内部上拉电阻，并处理为按下时为 True (低电平触发)。
@@ -3783,8 +3780,6 @@ import time
 import smbus
 from hiwonder.display import TM1640
 from hiwonder.number_model import render_number
-
-
 class AHT10:
     CONFIG = [0x08, 0x00]
     MEASURE = [0x33, 0x00]
@@ -3803,10 +3798,7 @@ class AHT10:
         ctemp = ((temp*200) / 1048576) - 50
         hum = ((data[1] << 16) | (data[2] << 8) | data[3]) >> 4
         chum = int(hum * 100 / 1048576)
-        
         return (ctemp, chum)
-
-
 if __name__ == '__main__':
     aht10 = AHT10()
     display = TM1640(dio=22, clk=24)
@@ -3814,23 +3806,16 @@ if __name__ == '__main__':
     while True:
         # 提取温度
         tempture = str(round(aht10.getData()[0], 1))
-
         # 提取出三个数字
         num1, num2, num3 = tempture[0], tempture[1], tempture[3]
-
         display.display_buf = render_number(num1, num2, ".", num3)
         display.update_display()
-
         time.sleep(2)
-
         #提取湿度
         humidity = str(round(aht10.getData()[1], 1))
-
         # 提取出两个数字
         num1, num2 = humidity[0], humidity[1]
-
         display.display_buf = render_number(num1, num2, "%", "%")
-        
         time.sleep(2)
 
 ```
@@ -3847,18 +3832,11 @@ import sys
 import time
 import hiwonder.Sonar as Sonar
 
-if sys.version_info.major == 2:
-    print('Please run this program with python3!')
-    sys.exit(0)
-
-
-
 s = Sonar.Sonar()
 s.setRGBMode(0)    #设置灯的模式，0为彩灯模式，1为呼吸灯模式(set the light mode, 0 is color light mode, 1 is breathing light mode)
 s.setRGB(1, (35,205,55))
 s.setRGB(0, (235,205,55))
 s.startSymphony()
-
 if __name__ == "__main__":
     while True:
         time.sleep(1)
@@ -3901,21 +3879,9 @@ import time
 # 替换 gpiod 库为 gpiozero 库
 from gpiozero import DigitalInputDevice
 import hiwonder.ros_robot_controller_sdk as rrc
-
-if sys.version_info.major == 2:
-    print('Please run this program with python3!')
-    sys.exit(0)
-
-
 board = rrc.Board()
-    
 st = 0 # 状态变量，用于防止反复响
-
-# 使用 DigitalInputDevice 初始化引脚 24。
-# 设置 pull_up=True 启用内部上拉电阻，与原代码的 gpiod.LINE_REQ_FLAG_BIAS_PULL_UP 作用一致。
-# 注意：假设这里的 24 对应于 BCM 编号 24。
 light = DigitalInputDevice(24, pull_up=True)
-
 if __name__ == "__main__":
     try:
         while True:
@@ -3923,14 +3889,12 @@ if __name__ == "__main__":
             # 大多数数字光线传感器模块在感应到光线变化时会输出低电平（0）。
             state = light.value  
             print(state)
-            
             if not state: # 如果状态为低电平（0）
                 if st:            # 这里做一个判断，防止反复响
                     st = 0
                     # 以1900Hz的频率，持续响0.1秒，关闭0.9秒，重复1次
                     board.set_buzzer(1900, 0.1, 0.9, 1) 
                     time.sleep(1) # 增加的延时确保蜂鸣器响完
-                
             else: # 如果状态为高电平（1）
                 st = 1
                 # 关闭蜂鸣器
