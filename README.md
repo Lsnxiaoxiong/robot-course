@@ -3671,6 +3671,7 @@ gpiozero 是一个高级库，它使用起来非常简单，并且在底层它�
 ```shell
 pip install gpiozero
 pip install lgpio
+pip install smbus2
 ```
 
 
