@@ -11,7 +11,7 @@ import sounddevice as sd
 
 def generate():
     # 注意：这里的 50007 应该是整数端口号
-    HOST = 'localhost'
+    HOST = '192.168.137.248'
     PORT = 50007
 
     client = None  # 初始化 client 变量
@@ -79,7 +79,7 @@ def play():
 
 
 if __name__ == '__main__':
-    threading.Thread(target=play).start()
-    time.sleep(1)
+    # threading.Thread(target=play).start()
+    # time.sleep(1)
 
     generate()

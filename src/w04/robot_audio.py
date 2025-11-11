@@ -59,7 +59,7 @@ class RobotAudio:
     def receive_audio_server(self):
         """音频接收服务端：监听连接，接收并播放"""
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.bind((self.host, self.port))
+        server.bind(('0.0.0.0', self.port))
         server.listen(1)
         print(f"接收服务端启动，等待连接...")
         conn, addr = server.accept()
