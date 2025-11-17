@@ -9,9 +9,11 @@ from src.w04.s06_kokoro import AudioGenerator
 
 import sounddevice as sd
 
+audio_generator = None
+
 def generate():
     # 注意：这里的 50007 应该是整数端口号
-    HOST = '192.168.137.248'
+    HOST = '192.168.137.95'
     PORT = 50007
 
     client = None  # 初始化 client 变量
@@ -80,6 +82,11 @@ def play():
 
 if __name__ == '__main__':
     # threading.Thread(target=play).start()
-    # time.sleep(1)
+    time.sleep(1)
 
     generate()
+
+    # text = ""
+    # while True:
+    #     text = input("请输入要转换的文本：")
+    #     audio_generator.push_text()

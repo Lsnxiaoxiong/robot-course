@@ -40,8 +40,6 @@ def asr():
     print(f"客户端已连接: {addr}")
 
     recognizer = SpeechRecognizer()
-
-
     try:
         while True:
             # print("等待录音...")
@@ -60,5 +58,5 @@ def asr():
 if __name__ == "__main__":
     threading.Thread(target=asr).start()
     # asr()
-    # time.sleep(1)
-    # send_audio_client("localhost")
+    time.sleep(1)
+    send_audio_client("localhost")

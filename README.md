@@ -3926,15 +3926,220 @@ if __name__ == "__main__":
 
 ## YOLO目标检测
 
-模型部署、训练
+[官网](https://github.com/ultralytics/ultralytics)
+
+![image-20251117102733285](README_assets/image-20251117102733285.png)
+
+![image-20251117102812035](README_assets/image-20251117102812035.png)
+
+
+
+
+
+### 安装
+
+直接使用命令，或者下载源码之后手动安装。
+
+```shell
+pip install ultralytics
+```
+
+
+
+![image-20251117103642931](README_assets/image-20251117103642931.png)
+
+
+
+### 运行
+
+运行下面代码，可以对图片进行检测，展示识别到的目标并绘制矩形框。
+
+```python
+from ultralytics import YOLO
+
+# Load a pretrained YOLO11n model
+model = YOLO("yolo11n.pt")
+
+# Train the model on the COCO8 dataset for 100 epochs
+# train_results = model.train(
+#     data="coco8.yaml",  # Path to dataset configuration file
+#     epochs=100,  # Number of training epochs
+#     imgsz=640,  # Image size for training
+#     device="cuda",  # Device to run on (e.g., 'cpu', 0, [0,1,2,3])
+# )
+
+# Evaluate the model's performance on the validation set
+# metrics = model.val()
+
+# Perform object detection on an image
+results = model("./bus.jpg")  # Predict on an image
+results[0].show()  # Display results
+
+# Export the model to ONNX format for deployment
+# path = model.export(format="onnx")  # Returns the path to the exported model
+```
+
+
+
+![image-20251117103614946](README_assets/image-20251117103614946.png)
+
+
+
+### 获取机器人视频流检测
+
+机器人上运行服务端，将视频流分发。
+
+```python
+import cv2
+import socket
+import struct
+
+# 创建 socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server_socket.bind(("0.0.0.0", 8888))  # 监听所有网卡的 8888 端口
+server_socket.listen(1)
+
+print("等待客户端连接...")
+conn, addr = server_socket.accept()
+print("客户端已连接：", addr)
+
+cap = cv2.VideoCapture(0)  # 读取摄像头（0）或视频文件
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # 压缩为 JPG
+    ret, buffer = cv2.imencode(".jpg", frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
+    data = buffer.tobytes()
+
+    # 先发送长度，再发送数据
+    conn.sendall(struct.pack(">I", len(data)) + data)
+
+cap.release()
+conn.close()
+server_socket.close()
+
+```
+
+
+
+电脑运行yolo客户端，获取视频流并进行目标检测。
+
+```python
+import cv2
+from ultralytics import YOLO
+from src.utils.video_stream import get_frame
+
+if __name__ == "__main__":
+
+    model = YOLO("yolo11n.pt")
+    model.to("cuda")
+    for frame in get_frame(ip="localhost", port=8888):
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+        results = model(frame, stream=True, conf=0.5)  # conf 设置置信度阈值
+        for result in results:
+            annotated_frame = result.plot()
+            cv2.imshow("YOLO11 Detection", annotated_frame)
+```
+
+
+
+
+
+
 
 ## LLM大语言模型
 
-基本概念、原理、主流模型调用
+![llms](README_assets/llms.png)
+
+
+
+### Qwen
+
+[官网](https://www.aliyun.com/product/tongyi?spm=5176.29597918.J_4VYgf18xNlTAyFFbOuOQe.d_menu_0.2b8e7b08Gy9WHG)
+
+![image-20251117132715254](README_assets/image-20251117132715254.png)
+
+
+
+#### 示例
+
+```python
+
+if __name__ == "__main__":
+    import os
+    from openai import OpenAI
+
+    client = OpenAI(
+        # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key="sk-xxx"
+        api_key="sk-cc47b40266194755b4d3985ccc82e10c",
+        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+    ) 
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant. The answers need to be short and simple as possible."},
+        {"role": "user", "content": "大模型的发展前景如何？"},
+    ]
+
+    # messages = [
+    #     ChatCompletionSystemMessageParam(role="system", content="You are a helpful assistant."),
+    #     ChatCompletionUserMessageParam(role="user", content="你是谁？"),
+    # ]
+    completion = client.chat.completions.create(
+        model="qwen-flash",
+        messages=messages,
+        extra_body={"enable_thinking": True},
+        stream=True
+    )
+    is_answering = False  # 是否进入回复阶段
+    print("\n" + "=" * 20 + "思考过程" + "=" * 20)
+    for chunk in completion:
+        delta = chunk.choices[0].delta
+        if hasattr(delta, "reasoning_content") and delta.reasoning_content is not None:
+            if not is_answering:
+                print(delta.reasoning_content, end="", flush=True)
+        if hasattr(delta, "content") and delta.content:
+            if not is_answering:
+                print("\n" + "=" * 20 + "完整回复" + "=" * 20)
+                is_answering = True
+            print(delta.content, end="", flush=True)
+
+```
+
+
+
+
+
+
 
 ## MCP Server与Client
 
-编写MCP服务端与客户端，让大模型能调用自定义的工具。
+### 前言
+
+
+
+### MCP
+
+[官网](https://modelcontextprotocol.io/docs/getting-started/intro)
+
+MCP是AI应用的接口，能将各种外部系统连接到AI应用中。
+
+![image-20251117155706828](README_assets/image-20251117155706828.png)
+
+
+
+#### 安装
+
+
+
+```shell
+pip install "mcp[cli]"
+```
+
+
 
 
 
@@ -3996,8 +4201,6 @@ if __name__ == "__main__":
 # 作品展示（第11周）
 
 同学展示作品。
-
-
 
 
 
