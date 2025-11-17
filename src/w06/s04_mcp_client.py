@@ -27,14 +27,13 @@ class MCPClient:
 
         self.messages = [
 
-            # {
-            #     "role": "system",
-            #     "content": """
-            #     """
-            # },
+            {
+                "role": "system",
+                "content": """
+                Answer in Chinese, and be simple and short as possible. With no emojis and markdown format.
+                """
+            },
         ]
-
-    # methods will go here
 
     async def connect_to_all_servers(self):
         self.server_configs = [
