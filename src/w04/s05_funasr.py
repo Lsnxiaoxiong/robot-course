@@ -1,3 +1,4 @@
+import logging
 import threading
 import time
 from datetime import datetime
@@ -34,6 +35,7 @@ class SpeechRecognizer:
         self.temp_text = ""
         self.pre_timestamp: float = 0
         self.cur_saving_timestamp = 0
+        logging.log(20, f"模型加载成功！")
 
     def recognize(self, speech_chunk):
         # 推理（流式）
@@ -48,7 +50,7 @@ class SpeechRecognizer:
         )
 
         self.save_recognition_res(res)
-        # print(f"✅ 识别结果：{res} 耗时：{end_time - start_time:.2f}s")
+        print(f"✅ 识别结果：{res} ")
 
         # 输出增量识别结果
         # print(res)
@@ -77,6 +79,7 @@ class SpeechRecognizer:
 
     def save_recognition_res(self, res):
         interval_time = datetime.now().timestamp() - self.pre_timestamp
+        print(f"pre_timestamp: {self.pre_timestamp}, interval_time: {interval_time}")
         if res[0]['text'] == '':
             if self.pre_timestamp !=0 and interval_time > 1:
                 final_res = self._generate_final()
@@ -91,10 +94,15 @@ class SpeechRecognizer:
             self.pre_timestamp = self.cur_saving_timestamp = datetime.now().timestamp()
             self.temp_text += res[0]['text']
             print(f"{self.pre_timestamp} 开始结果：{self.temp_text}")
-        elif interval_time < 1:
+        elif interval_time < 0.65:
             self.temp_text += res[0]['text']
             self.pre_timestamp = datetime.now().timestamp()
             print(f"识别结果：{self.temp_text}")
+        else:
+            self.temp_text += res[0]['text'] + ','
+            self.pre_timestamp = datetime.now().timestamp()
+            print(f"识别结果：{self.temp_text}")
+
         # else:
         #     final_res = self._generate_final()
         #     self.temp_text += final_res[0]['text']
