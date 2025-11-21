@@ -45,6 +45,7 @@ def asr():
             # print("等待录音...")
             data = conn.recv(19200)  # int16 = 2 bytes
             audio_chunk = np.frombuffer(data, dtype=np.int16)
+            print("=====>",len(audio_chunk))
             recognizer.start_reco_with_audio(audio_chunk)
             if not data:
                 break
@@ -58,5 +59,5 @@ def asr():
 if __name__ == "__main__":
     threading.Thread(target=asr).start()
     # asr()
-    time.sleep(1)
-    send_audio_client("localhost")
+    # time.sleep(1)
+    # send_audio_client("localhost")

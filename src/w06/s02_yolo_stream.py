@@ -1,7 +1,8 @@
 from ultralytics import YOLO
 import cv2
 
-model = YOLO("yolo11n.pt")
+# model = YOLO("yolo11n.pt")
+model = YOLO("YOLOv10n_gestures.pt")
 cap = cv2.VideoCapture(0)
 
 # 设置视频流参数（可选）

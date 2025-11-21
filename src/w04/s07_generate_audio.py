@@ -4,7 +4,6 @@ import time
 
 import numpy as np
 
-from src.w04.robot_audio import RobotAudio
 from src.w04.s06_kokoro import AudioGenerator
 
 import sounddevice as sd
@@ -13,7 +12,8 @@ audio_generator = None
 
 def generate():
     # 注意：这里的 50007 应该是整数端口号
-    HOST = '192.168.137.95'
+    # HOST = '192.168.137.95'
+    HOST = 'localhost'
     PORT = 50007
 
     client = None  # 初始化 client 变量
@@ -57,7 +57,7 @@ def generate():
 
 def play():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(('localhost', 50007))
+    server.bind(('0.0.0.0', 50007))
     server.listen(1)
     print(f"接收服务端启动，等待连接...")
     conn, addr = server.accept()
@@ -81,7 +81,7 @@ def play():
 
 
 if __name__ == '__main__':
-    # threading.Thread(target=play).start()
+    threading.Thread(target=play).start()
     time.sleep(1)
 
     generate()

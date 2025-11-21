@@ -31,36 +31,37 @@ def asr(audio_queue, recognizer):
 
 if __name__ == "__main__":
 
-    audio_queue = queue.Queue(maxsize=1000)
+    while True:
+        audio_queue = queue.Queue(maxsize=1000)
 
-    recognizer = SpeechRecognizer()
-    threading.Thread(target=asr, args=(audio_queue, recognizer)).start()
+        recognizer = SpeechRecognizer()
+        threading.Thread(target=asr, args=(audio_queue, recognizer)).start()
 
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(('0.0.0.0', 50007))
-    server.listen(1)
-    print(f"接收服务端启动，等待连接...")
-    conn, addr = server.accept()
-    print(f"客户端已连接: {addr}")
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.bind(('0.0.0.0', 50007))
+        server.listen(1)
+        print(f"接收服务端启动，等待连接...")
+        conn, addr = server.accept()
+        print(f"客户端已连接: {addr}")
 
-    stream = sd.OutputStream(samplerate=16000, channels=1, dtype="int16",
-                            blocksize=9600)
-    stream.start()
-    try:
-        while True:
-            # print("等待录音...")
-            data = recv_exact(conn, 9600*2)
-            audio_chunk = np.frombuffer(data, dtype=np.int16)
+        stream = sd.OutputStream(samplerate=16000, channels=1, dtype="int16",
+                                blocksize=9600)
+        stream.start()
+        try:
+            while True:
+                # print("等待录音...")
+                data = recv_exact(conn, 9600*2)
+                audio_chunk = np.frombuffer(data, dtype=np.int16)
 
-            print("=====>",len(audio_chunk))
-            audio_queue.put(audio_chunk)
+                print("=====>",len(audio_chunk))
+                audio_queue.put(audio_chunk)
 
-            print("<<<", datetime.now(), len(audio_queue.queue))
-            stream.write(audio_chunk)
-            if not data:
-                break
-    except Exception as e:
-        print("接收服务端断开:", e)
-    finally:
-        conn.close()
-        server.close()
+                print("<<<", datetime.now(), len(audio_queue.queue))
+                stream.write(audio_chunk)
+                if not data:
+                    break
+        except Exception as e:
+            print("接收服务端断开:", e)
+        finally:
+            conn.close()
+            server.close()

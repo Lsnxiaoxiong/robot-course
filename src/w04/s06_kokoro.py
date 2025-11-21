@@ -14,8 +14,10 @@ class AudioGenerator:
     def __init__(self):
         self.config_path = "../../model/kokoro82m/config.json"
         self.model_path = "../../model/kokoro82m/kokoro-v1_0.pth"
+        self.voice = torch.load('../../model/kokoro82m/zf_xiaoxiao.pt', weights_only=True)
+
         self.kmodel = KModel(config=self.config_path, model=self.model_path)
-        self.pipeline = KPipeline(lang_code='z', device='cpu')
+        self.pipeline = KPipeline(lang_code='z', device='cpu', model=self.kmodel)
         self._play_pause_event = threading.Event()
         self._generate_pause_event = threading.Event()
         self._stop_event = threading.Event()
@@ -32,7 +34,7 @@ class AudioGenerator:
             text = self.text_queue.get()
             print(f">>>开始生成音频：{text}")
             generator = self.pipeline(
-                text, voice='zf_xiaoxiao', model=self.kmodel,
+                text, voice=self.voice, model=self.kmodel,
                 speed=0.95, split_pattern=r'[。！？,\.\!\?、\n]+'
             )
             for i, (gs, ps, audio) in enumerate(generator):

@@ -3,7 +3,7 @@ from enum import Enum
 from openai import OpenAI
 
 ALIYUN_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1'
-ALIYUN_API_KEY = 'sk-cc47b40266194755b4d3985ccc82e10c'
+ALIYUN_API_KEY = 'sk-4a35c55c078845fab41cbb4f2a838606'
 DEEPSEEK_BASE_URL = 'https://api.deepseek.com/v1'
 DEEPSEEK_API_KEY = 'sk-167357ec3614423ca14eca722adb7e7a'
 

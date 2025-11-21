@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     model = YOLO("yolo11n.pt")
     model.to("cuda")
-    for frame in get_frame(ip="localhost", port=8888):
+    for frame in get_frame(ip="192.168.137.248", port=8888):
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
         results = model(frame, stream=True, conf=0.5)  # conf 设置置信度阈值

@@ -14,10 +14,11 @@ config_path = "../../model/kokoro82m/config.json"
 model_path = "../../model/kokoro82m/kokoro-v1_0.pth"
 kmodel = KModel(config=config_path, model=model_path)
 
+voice_tensor = torch.load('../../model/kokoro82m/zf_xiaoxiao.pt', weights_only=True)
 # 指定模型目录
 # model_dir = r"D:\huggingface\hub\models--hexgrad--Kokoro-82M\snapshots\f3ff3571791e39611d31c381e3a41a3af07b4987"
 
-pipeline = KPipeline(lang_code='z',device='cpu')
+pipeline = KPipeline(lang_code='z',device='cpu', model=kmodel)
 # text = '''
 # [Kokoro](/kˈOkəɹO/) is an open-weight TTS model with 82 million parameters. Despite its lightweight architecture, it delivers comparable quality to larger models while being significantly faster and more cost-efficient. With Apache-licensed weights, [Kokoro](/kˈOkəɹO/) can be deployed anywhere from production environments to personal projects.
 # '''
@@ -27,14 +28,14 @@ text = """
 你对于某个问题没有调查，就停止你对于某个问题的发言权。这不太野蛮了吗？一点也不野蛮。你对那个问题的现实情况和历史情况既然没有调查，不知底里，对于那个问题的发言便一定是瞎说一顿。
 """
 generator = pipeline(
-    text, voice='zf_xiaoxiao',model=kmodel,
+    text, voice= voice_tensor,
     speed=0.95, split_pattern=r'[。！？,\.\!\?、\n]+'
 )
 
 # 播放队列
 audio_queue = queue.Queue()
 
-def player_worker(rate=16000):
+def player_worker(rate=24000):
     """持续从队列中读取并顺序播放音频"""
     while True:
         i, audio = audio_queue.get()  # 阻塞等待音频

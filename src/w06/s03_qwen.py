@@ -5,7 +5,7 @@ if __name__ == "__main__":
 
     client = OpenAI(
         # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key="sk-xxx"
-        api_key="sk-cc47b40266194755b4d3985ccc82e10c",
+        api_key="sk-4a35c55c078845fab41cbb4f2a838606",
         base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
     )
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     completion = client.chat.completions.create(
         model="qwen-flash",
         messages=messages,
-        extra_body={"enable_thinking": True},
+        extra_body={"enable_thinking": False},
         stream=True
     )
     is_answering = False  # 是否进入回复阶段

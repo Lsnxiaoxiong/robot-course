@@ -1,5 +1,5 @@
 # 3️⃣ Initalize a pipeline
-from kokoro import KPipeline
+from kokoro import KPipeline, KModel
 from IPython.display import display, Audio
 import soundfile as sf
 import torch
@@ -11,7 +11,11 @@ import torch
 # 🇯🇵 'j' => Japanese: pip install misaki[ja]
 # 🇧🇷 'p' => Brazilian Portuguese pt-br
 # 🇨🇳 'z' => Mandarin Chinese: pip install misaki[zh]
-pipeline = KPipeline(lang_code='j') # <= make sure lang_code matches voice, reference above.
+
+config_path = "../../model/kokoro82m/config.json"
+model_path = "../../model/kokoro82m/kokoro-v1_0.pth"
+kmodel = KModel(config=config_path, model=model_path)
+pipeline = KPipeline(lang_code='z', model=kmodel) # <= make sure lang_code matches voice, reference above.
 
 # This text is for demonstration purposes only, unseen during training
 # text = '''
@@ -23,8 +27,8 @@ pipeline = KPipeline(lang_code='j') # <= make sure lang_code matches voice, refe
 #
 # [Kokoro](/kˈOkəɹO/) is an open-weight TTS model with 82 million parameters. Despite its lightweight architecture, it delivers comparable quality to larger models while being significantly faster and more cost-efficient. With Apache-licensed weights, [Kokoro](/kˈOkəɹO/) can be deployed anywhere from production environments to personal projects.
 # '''
-text = '「もしおれがただ偶然、そしてこうしようというつもりでなくここに立っているのなら、ちょっとばかり絶望するところだな」と、そんなことが彼の頭に思い浮かんだ。'
-# text = '中國人民不信邪也不怕邪，不惹事也不怕事，任何外國不要指望我們會拿自己的核心利益做交易，不要指望我們會吞下損害我國主權、安全、發展利益的苦果！'
+# text = '「もしおれがただ偶然、そしてこうしようというつもりでなくここに立っているのなら、ちょっとばかり絶望するところだな」と、そんなことが彼の頭に思い浮かんだ。'
+text = '中國人民不信邪也不怕邪，不惹事也不怕事，任何外國不要指望我們會拿自己的核心利益做交易，不要指望我們會吞下損害我國主權、安全、發展利益的苦果！'
 # text = 'Los partidos políticos tradicionales compiten con los populismos y los movimientos asamblearios.'
 # text = 'Le dromadaire resplendissant déambulait tranquillement dans les méandres en mastiquant de petites feuilles vernissées.'
 # text = 'ट्रांसपोर्टरों की हड़ताल लगातार पांचवें दिन जारी, दिसंबर से इलेक्ट्रॉनिक टोल कलेक्शनल सिस्टम'
@@ -33,8 +37,8 @@ text = '「もしおれがただ偶然、そしてこうしようというつも
 
 # 4️⃣ Generate, display, and save audio files in a loop.
 generator = pipeline(
-    text, voice='jf_gongitsune', # <= change voice here
-    speed=1, split_pattern=r'\n+'
+    text, voice='zf_xiaoxiao', # <= change voice here
+    speed=1, split_pattern=r'\n+',model=kmodel
 )
 # Alternatively, load voice tensor directly:
 # voice_tensor = torch.load('path/to/voice.pt', weights_only=True)

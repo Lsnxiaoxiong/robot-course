@@ -92,7 +92,8 @@ class RobotAudio:
         stream.start()
         try:
             while True:
-                data = client.recv(self.chunk_stride * 2)  # int16 = 2 bytes
+                # data = client.recv(self.chunk_stride * 2)  # int16 = 2 bytes
+                data = client.recv(960)  # int16 = 2 bytes
                 if not data:
                     break
                 stream.write(np.frombuffer(data, dtype="int16"))
@@ -110,5 +111,5 @@ if __name__ == "__main__":
     # 根据需要选择运行模式：
     # robot.send_audio_server()              # 作为发送服务端
     # robot.send_audio_client("192.168.1.100")  # 作为发送客户端
-    robot.receive_audio_server()           # 作为接收服务端
-    # robot.receive_audio_client("192.168.1.100")  # 作为接收客户端
+    # robot.receive_audio_server()           # 作为接收服务端
+    robot.receive_audio_client("192.168.1.104")  # 作为接收客户端
