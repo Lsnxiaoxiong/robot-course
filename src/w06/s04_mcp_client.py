@@ -47,7 +47,7 @@ class MCPClient:
                     "run",
                     "s04_mcp_demo01.py"
                 ]
-            }
+            },
             # {
             #
             #     "command": "uv",

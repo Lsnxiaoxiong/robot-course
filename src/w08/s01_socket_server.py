@@ -10,14 +10,11 @@ class SocketServer:
     def __init__(self, host: str = "0.0.0.0", port: int = 8888):
         self.host = host
         self.port = port
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((self.host, self.port))
-        self.socket.listen(1)
-        print(f"服务器启动，监听 {self.host}:{self.port}")
-        self.conn, self.addr = self.socket.accept()
-        print(f"已连接: {self.addr}")
+        self.socket = None
+        self.conn, self.addr = None, None
         self.received_msg: queue.Queue = queue.Queue()
-        self._recv_thread: Optional[threading.Thread] = threading.Thread(target=self.receive_msg).start()
+        self._thread_server = threading.Thread(target=self._server_worker)
+        self._thread_server.start()
 
     def recv_exact(self, n_bytes):
         buffer = b""
@@ -27,6 +24,26 @@ class SocketServer:
                 raise ConnectionError("Socket connection broken")
             buffer += packet
         return buffer
+
+    def _server_worker(self):
+        while True:
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.bind((self.host, self.port))
+            self.socket.listen(1)
+            print(f"服务器启动，监听 {self.host}:{self.port}")
+            self.conn, self.addr = self.socket.accept()
+            print(f"已连接: {self.addr}")
+            try:
+                thread_receive = threading.Thread(target=self.receive_msg)
+                thread_receive.start()
+                thread_receive.join()
+            except:
+                print("连接断开")
+            finally:
+                self.conn.close()
+                self.socket.close()
+
+
 
     def receive_msg(self):
         try:

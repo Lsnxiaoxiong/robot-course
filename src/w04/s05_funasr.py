@@ -50,6 +50,8 @@ class SpeechRecognizer:
         )
 
         self.save_recognition_res(res)
+        if res[0]['text'] == '':
+            return
         print(f"✅ 识别结果：{res} ")
 
         # 输出增量识别结果
@@ -79,7 +81,7 @@ class SpeechRecognizer:
 
     def save_recognition_res(self, res):
         interval_time = datetime.now().timestamp() - self.pre_timestamp
-        print(f"pre_timestamp: {self.pre_timestamp}, interval_time: {interval_time}")
+        # print(f"pre_timestamp: {self.pre_timestamp}, interval_time: {interval_time}")
         if res[0]['text'] == '':
             if self.pre_timestamp !=0 and interval_time > 1:
                 final_res = self._generate_final()

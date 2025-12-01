@@ -3,7 +3,7 @@ from enum import Enum
 from openai import OpenAI
 
 ALIYUN_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1'
-ALIYUN_API_KEY = 'sk-4a35c55c078845fab41cbb4f2a838606'
+ALIYUN_API_KEY = 'sk-ddaf46f7c4c743fb8993a3a9f4fa122d'
 DEEPSEEK_BASE_URL = 'https://api.deepseek.com/v1'
 DEEPSEEK_API_KEY = 'sk-167357ec3614423ca14eca722adb7e7a'
 
@@ -30,6 +30,7 @@ class ModelEnum(Enum):
 
     QWEN_VL_PLUS = Model(base_url=ALIYUN_BASE_URL, api_key=ALIYUN_API_KEY, model_name='qwen-vl-plus')
 
+    QWEN3_MAX = Model(base_url=ALIYUN_BASE_URL, api_key=ALIYUN_API_KEY, model_name='qwen3-max')
     QWEN_FLASH = Model(base_url=ALIYUN_BASE_URL, api_key=ALIYUN_API_KEY, model_name='qwen-flash')
     QWEN_PLUS = Model(base_url=ALIYUN_BASE_URL, api_key=ALIYUN_API_KEY, model_name='qwen-plus')
     QWEN_TURBO = Model(base_url=ALIYUN_BASE_URL, api_key=ALIYUN_API_KEY, model_name='qwen-turbo')

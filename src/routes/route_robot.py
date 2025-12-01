@@ -17,6 +17,8 @@ board = rrc.Board()
 ctl = Controller(board)
 
 
+
+
 @robot_bp.route('/action/start', methods=['POST'])
 def start_action() -> Response:
     """
@@ -103,18 +105,18 @@ def turn_head() -> Response:
     })
 
 
+
 @robot_bp.route('/run_once', methods=['GET'])
 def run_once() -> Response:
     """
     执行一次动作组
-      请求体参数:
-        action_name: 动作名称。从ActionGroup枚举类中选择。
     :return: 响应结果
     """
-    action_name = request.view_args.get('action_name')
+    action_name = request.args.get('action_name')
+    times = request.args.get('times', default=1, type=int)
     if action_name is None:
         return Result.failed(RobotRespCode.MISSING_PARAMETER)
-    AGC.runActionGroup(action_name)
+    AGC.runActionGroup(actName=action_name, times=times)
     return Result.success(data={
         "action_name": action_name
     })

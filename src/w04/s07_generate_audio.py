@@ -14,7 +14,7 @@ def generate():
     # 注意：这里的 50007 应该是整数端口号
     # HOST = '192.168.137.95'
     HOST = 'localhost'
-    PORT = 50007
+    PORT = 50008
 
     client = None  # 初始化 client 变量
     try:
@@ -57,7 +57,7 @@ def generate():
 
 def play():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(('0.0.0.0', 50007))
+    server.bind(('0.0.0.0', 50008))
     server.listen(1)
     print(f"接收服务端启动，等待连接...")
     conn, addr = server.accept()

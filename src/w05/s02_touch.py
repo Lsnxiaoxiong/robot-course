@@ -8,7 +8,6 @@ import hiwonder.ros_robot_controller_sdk as rrc
 board = rrc.Board()
 
 st = 0  # 状态变量，用于防止反复响
-
 # 使用 Button 类初始化引脚 22。Button 默认启用内部上拉电阻，并处理为按下时为 True (低电平触发)。
 # 注意：假设这里的 22 对应于 BCM 编号 22。
 touch = Button(22)
