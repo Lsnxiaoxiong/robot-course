@@ -48,6 +48,6 @@ def receive_audio_client(server_ip, port=50008):
 
 
 if __name__ == "__main__":
-    threading.Thread(target=receive_audio_client, args=("192.168.1.102",)).start()
-    threading.Thread(target=send_audio_client, args=("192.168.1.102",)).start()
+    threading.Thread(target=receive_audio_client, args=("10.127.194.224",)).start()
+    threading.Thread(target=send_audio_client, args=("10.127.194.224",)).start()
     TouchSensor(pin=22, buzzer_enabled=True).start()

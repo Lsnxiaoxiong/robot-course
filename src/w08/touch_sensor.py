@@ -21,7 +21,7 @@ class TouchSensor:
             pin (int): GPIO引脚号 (BCM编号)
             buzzer_enabled (bool): 是否启用蜂鸣器反馈
         """
-        self.socket = SocketClient(host="192.168.102")
+        self.socket = SocketClient(host="10.127.194.224")
         self.pin = pin
         self.buzzer_enabled = buzzer_enabled
 

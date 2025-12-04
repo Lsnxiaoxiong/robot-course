@@ -34,7 +34,7 @@ class TTSServer:
         self.tts = AudioGenerator()
         self.tts.start_generate()
 
-        threading.Thread(target=self._server_worker).start()
+        threading.Thread(target=self._server_worker ).start()
         threading.Thread(target=self._tts_worker).start()
 
 
@@ -80,11 +80,11 @@ class TTSServer:
                 self.socket.close()
 
 
-# if __name__ == "__main__":
-#     tts_server = TTSServer()
-#
-#     while True:
-#         text = input("请输入要转换的文本：")
-#         if text == 'exit':
-#             break
-#         tts_server.text_queue.put(text)
+if __name__ == "__main__":
+    tts_server = TTSServer()
+
+    while True:
+        text = input("请输入要转换的文本：")
+        if text == 'exit':
+            break
+        tts_server.text_queue.put(text)

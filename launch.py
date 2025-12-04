@@ -8,6 +8,6 @@ if __name__ == '__main__':
         "--workers", "1",
         "--threads", "4",
         "--timeout", "600",
-        "--bind", "0.0.0.0:5000",
+        "--bind", "0.0.0.0:50000",
         "src.app:app"
     ])

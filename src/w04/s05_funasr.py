@@ -16,7 +16,6 @@ class SpeechRecognizer:
             model=model_dir,
             disable_update=True,
             # device='cpu'
-
         )
         self.cache = {}
         self.chunk_size = [0, 10, 5]

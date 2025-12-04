@@ -31,11 +31,12 @@ class MCPClient:
         self.model = ModelEnum.QWEN3_MAX.value
 
         self.messages = [
-
             {
                 "role": "system",
                 "content": """
-                Now you need to play as a Robot, interact with user. Answer in Chinese, and be simple and short as possible. With no emojis and markdown format.
+                Now you need to play as a Robot, named “小幻” in chinese, interact with user. Answer in Chinese, and be simple and short as possible. With no emojis and markdown format.
+                actions:
+                    + reformat the numbers in final res so that they can be speak correctly. eg: ‘18.1℃’ reformat to '十八点一摄氏度' and so on.
                 """
             },
         ]
@@ -243,7 +244,7 @@ async def main():
     try:
         await client.connect_to_all_servers()
         for msg in audio_input_control(socket_server, asr_server):
-            print( msg)
+            print(msg)
             res = await client.process_query(msg)
             print(res)
             tts_server.put_text(res)
