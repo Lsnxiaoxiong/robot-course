@@ -4116,6 +4116,24 @@ if __name__ == "__main__":
 
 
 
+![image-20251204144743996](README_assets/image-20251204144743996.png)
+
+
+
+![image-20251204144845780](README_assets/image-20251204144845780.png)
+
+
+
+![image-20251204144913100](README_assets/image-20251204144913100.png)
+
+
+
+
+
+![image-20251204144958194](README_assets/image-20251204144958194.png)
+
+
+
 ### MCP
 
 [官网](https://modelcontextprotocol.io/docs/getting-started/intro)
@@ -4128,11 +4146,17 @@ MCP是AI应用的接口，能将各种外部系统连接到AI应用中。
 
 #### 安装
 
-
-
 ```shell
 pip install "mcp[cli]"
 ```
+
+
+
+
+
+#### message
+
+![image-20251204145313629](README_assets/image-20251204145313629.png)
 
 
 
@@ -4168,9 +4192,86 @@ pip install "mcp[cli]"
 
 ## 系统设计
 
-## 示例项目：语音/手势控制
+![image-20251204145405889](README_assets/image-20251204145405889.png)
 
-根据语音与手势与机器人进行交互。
+
+
+### ASRServer
+
+![image-20251204145735466](README_assets/image-20251204145735466.png)
+
+![image-20251204145754463](README_assets/image-20251204145754463.png)
+
+
+
+
+
+### TTSServer
+
+![image-20251204145939747](README_assets/image-20251204145939747.png)
+
+
+
+## yolo-gestureRecognize
+
+[官网](https://github.com/hukenovs/hagrid?tab=readme-ov-file)
+
+![image-20251204150220040](README_assets/image-20251204150220040.png)
+
+
+
+![image-20251204150238589](README_assets/image-20251204150238589.png)
+
+
+
+### 示例
+
+```python
+from ultralytics import YOLO
+import cv2
+
+# model = YOLO("yolo11n.pt")
+model = YOLO("YOLOv10n_gestures.pt")
+cap = cv2.VideoCapture(0)
+
+# 设置视频流参数（可选）
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+while cap.isOpened():
+    success, frame = cap.read()
+
+    if success:
+        # 使用 stream=True 可以提高处理速度
+        results = model(frame, stream=True, conf=0.5)  # conf 设置置信度阈值
+
+        for result in results:
+            annotated_frame = result.plot()
+            cv2.imshow("YOLO11 Detection", annotated_frame)
+
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+    else:
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+
+```
+
+
+
+
+
+
+
+## 示例项目：语音控制
+
+​	将触摸传感器和麦克风扬声器与机器人连接。先在电脑上运行w08/mcp_client.py，这个程序会启动多个服务：socketServer、
+
+​	TTSServer、ASRServer、MCPServer。然后在机器人上运行w08/robot_client.py以及launch.py，这个程序会启动多个客户端连接：socketClient、AudioSendClient、AudioReceiveClient、TouchSensor、ActionController。
+
+​	启动后，对麦克风说话，电脑终端会实时输出识别的语音文本，按下触摸传感器，程序会将最近保存的结果输入给大模型。
 
 ## 练习
 
